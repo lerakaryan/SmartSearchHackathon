@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://localhost:8080/api' // Используем относительные пути
+    apiUrl: 'http://127.0.0.1:8000/api' // Используем относительные пути
   };

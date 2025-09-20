@@ -18,5 +18,16 @@
 
   <!-- Другие компоненты, которые получат результаты -->
   
+<div *ngIf="searchResults && searchResults.length > 0" class="search-results">
+    <h3>Найдено результатов: {{ searchResults.length }}</h3>
+    
+    <div *ngFor="let result of searchResults" class="result-item">
+      <h4>{{ result.largeName }}</h4>
+      <p class="preview">{{ result.previewText }}</p>
+      <p class="detail">{{ result.detailText }}</p>
+      <small>ID: {{ result.id }}</small>
+    </div>
+  </div>
+
 
 </div>
