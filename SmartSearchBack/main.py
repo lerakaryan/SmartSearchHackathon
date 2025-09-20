@@ -5,11 +5,21 @@ from pydantic import BaseModel
 from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
 import uvicorn
+from spellchecker import SpellChecker
+import re
 
 predictor = IntentPredictor()
 extractor = EntityExtractor()
 
 app = FastAPI(title="Intent & Entity API")
+
+test = SpellChecker(language='ru')
+ask_regex = "( |^)(кто|что|где|когда|почему|как|какие|сколько|зачем|чей|куда|откуда)( |$)|\?.*"
+
+def correction(text):
+    words = text.split(" ")
+    corrected_words = [test.correction(word) for word in words]
+    return " ".join(corrected_words)
 
 
 class TextRequest(BaseModel):
@@ -53,26 +63,27 @@ def intent_prediction(text: str) -> IntentEntity:
         )
 
 
-
 @app.post("/predict", response_model=PredictionResponse)
 def predict_intent(request: TextRequest):
 
+    knowledge_base_articles = []
 
-    #### сделать
-    is_question = False ## Regex
+    ## correction
+    text = correction(request)
+
+    #### regex
+    is_question = re.search(ask_regex, text.lower())
 
     if is_question:
-        # база знаний
-        pass
-
+        knowledge_base_articles = knowledge_base_search(text)
 
     #### сделать
-    registry_records = registry_search(request.text)
+    registry_records = registry_search(text)
 
     #### сделать
-    knowledge_base_articles = knowledge_base_search(request.text)
 
-    intents = intent_prediction(request.text)
+
+    intents = intent_prediction(text)
 
     return PredictionResponse(
         registry_records=registry_records,
