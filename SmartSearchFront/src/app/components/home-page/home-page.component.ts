@@ -7,10 +7,14 @@ import { SearchServiceService } from '../../services/search-service/search-servi
 import { PageInfo } from '../../interfaces/pageInfo';
 import { Router } from '@angular/router';
 import { InfoPageComponent } from "../info-page/info-page.component";
+import { QueryResponseWithId } from '../../models/query-response';
+import { RatingButtonComponent } from '../rating-button.component';
+import { QueryResponseTableComponent } from '../query-response-table';
 
 @Component({
   selector: 'app-home-page',
-  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, InfoPageComponent],
+  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, InfoPageComponent, RatingButtonComponent,
+    QueryResponseTableComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
   providers: [
@@ -33,6 +37,15 @@ searchResults: any ;
   isSearching: boolean = false;
   searchError: string = '';
  router = inject(Router);
+
+  showRatingTable = false;
+  queryResponses: QueryResponseWithId[] = [
+    { id: 1, query: 'как дела', response: 'нормально', rating: 0 },
+    { id: 2, query: 'сколько времени', response: '15:30', rating: 4 },
+    { id: 3, query: 'какая погода', response: 'солнечно', rating: 0 },
+    { id: 4, query: 'где находится', response: 'в офисе', rating: 2 }
+  ];
+
 
  onSearchResults(results: PageInfo): void {
     this.searchResults = results;
@@ -62,5 +75,20 @@ searchResults: any ;
      this.pageIsChosen = false; 
     this.searchError = error;
     this.isSearching = false;
+  }
+
+   onRatingButtonClick(): void {
+    this.showRatingTable = !this.showRatingTable;
+  }
+
+  onRatingChange(updatedItem: QueryResponseWithId): void {
+    const index = this.queryResponses.findIndex(item => item.id === updatedItem.id);
+    if (index !== -1) {
+      this.queryResponses[index] = updatedItem;
+      console.log('Оценка обновлена:', updatedItem);
+      
+      // Здесь можно отправить данные на сервер
+      // this.yourService.updateRating(updatedItem).subscribe();
+    }
   }
 }

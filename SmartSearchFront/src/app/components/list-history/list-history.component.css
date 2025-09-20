@@ -1,0 +1,72 @@
+/* query-response-table.component.css */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.query-response-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-family: Arial, sans-serif;
+}
+
+.query-response-table th {
+  background-color: #f5f5f5;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.query-response-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.table-row:hover {
+  background-color: #f9f9f9;
+}
+
+.query-cell {
+  min-width: 200px;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.response-cell {
+  min-width: 300px;
+  max-width: 500px;
+  word-wrap: break-word;
+}
+
+.rating-cell {
+  width: 100px;
+  text-align: center;
+}
+
+.rating-display {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.no-rating {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.actions-cell {
+  width: 150px;
+}
+
+.rating-select {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.rated-text {
+  color: #28a745;
+  font-weight: bold;
+}
