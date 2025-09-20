@@ -25,12 +25,12 @@ app.add_middleware(
     allow_headers=["*"],  # Разрешенные заголовки
 )
 
-# Инициализируем процессор
 processor = SmartSearchProcessor()
 
-# Модель для входных данных
+
 class SearchRequest(BaseModel):
     query: str
+
 
 # Модель для ответа
 class SearchResponse(BaseModel):
@@ -39,14 +39,10 @@ class SearchResponse(BaseModel):
     error: Optional[str] = None
     timestamp: str
 
+
 @app.post("/api/search", response_model=SearchResponse, summary="Обработать поисковый запрос")
 async def process_search(request: SearchRequest):
-    """
-    Принимает текстовый запрос и возвращает структурированный ответ с:
-    - намерением пользователя
-    - извлеченными сущностями
-    - рекомендациями по действию
-    """
+
     try:
         if not request.query or not request.query.strip():
             raise HTTPException(status_code=400, detail="Query cannot be empty")
@@ -65,14 +61,6 @@ async def process_search(request: SearchRequest):
         }
         return JSONResponse(content=error_response, status_code=500)
 
-@app.get("/api/health", summary="Проверка здоровья сервиса")
-async def health_check():
-    """Проверяет, что сервис работает корректно"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "service": "smart-search-api"
-    }
 
 @app.get("/api/intents", summary="Получить список поддерживаемых намерений")
 async def get_available_intents():

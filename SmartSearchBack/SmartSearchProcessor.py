@@ -6,7 +6,7 @@ from symspellpy import SymSpell, Verbosity
 import pkg_resources
 from pymorphy3 import MorphAnalyzer
 from nltk.corpus import stopwords
-
+import nltk
 
 class TextPreprocessor:
     def __init__(self):
@@ -192,7 +192,7 @@ class IntentClassifier:
                 "description": "Добавление оферты в корзину",
                 "examples": ["добавить в корзину", "положить в корзину", "добавь оферту"],
                 "type": "action"
-            }, 
+            },
             "remove_from_cart": {
                 "description": "Удаление оферты из корзины",
                 "examples": ["удалить из корзины", "убрать из корзины", "удали оферту"],
