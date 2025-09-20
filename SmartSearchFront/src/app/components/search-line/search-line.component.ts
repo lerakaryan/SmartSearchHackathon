@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchServiceService } from '../../services/search-service/search-service.service';
 import { RawData } from '../../interfaces/rawData';
 import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
-import { Hint } from '../../interfaces/hint';
+import { BaseHint, SearchResponse } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-search-line',
@@ -17,7 +17,7 @@ export class SearchLineComponent {
   isLoading: boolean = false;
 rawData: RawData = { text: '' };
  showSuggestions: boolean = false;
-  suggestions: Hint[] = [];
+  suggestions!: SearchResponse; 
   @Output() searchResults = new EventEmitter<any>();
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
@@ -43,30 +43,31 @@ rawData: RawData = { text: '' };
       });
 
     // Навигация по подсказкам
-    fromEvent(this.searchInput.nativeElement, 'keydown')
-      .subscribe((event: any) => {
-        if (this.showSuggestions && this.suggestions.length > 0) {
-          switch (event.key) {
-            case 'ArrowDown':
-              event.preventDefault();
-              this.selectNextSuggestion();
-              break;
-            case 'ArrowUp':
-              event.preventDefault();
-              this.selectPreviousSuggestion();
-              break;
-            case 'Enter':
-              event.preventDefault();
-              if (this.selectedSuggestionIndex >= 0) {
-                this.selectSuggestion(this.suggestions[this.selectedSuggestionIndex]);
-              }
-              break;
-            case 'Escape':
-              this.hideSuggestions();
-              break;
-          }
-        }
-      });
+    // fromEvent(this.searchInput.nativeElement, 'keydown')
+    //   .subscribe((event: any) => {
+    // //    if (this.showSuggestions && this.suggestions.length > 0) {
+    //       switch (event.key) {
+    //         case 'ArrowDown':
+    //           event.preventDefault();
+    //           this.selectNextSuggestion();
+    //           break;
+    //         case 'ArrowUp':
+    //           event.preventDefault();
+    //           this.selectPreviousSuggestion();
+    //           break;
+    //         case 'Enter':
+    //           event.preventDefault();
+    //           if (this.selectedSuggestionIndex >= 0) {
+    //            // this.selectSuggestion(this.suggestions[this.selectedSuggestionIndex]);
+    //           }
+    //           break;
+    //         case 'Escape':
+    //           this.hideSuggestions();
+    //           break;
+    //       }
+    //     }
+    //  // }
+    // );
   }
 
 
@@ -77,7 +78,7 @@ showSuggestionsForQuery(query: string) {
  
 
   console.log('Найдены подсказки:', this.suggestions);
-  this.showSuggestions = this.suggestions.length > 0;
+ // this.showSuggestions = this.suggestions.length > 0;
   this.selectedSuggestionIndex = -1;
 }
   
@@ -87,46 +88,56 @@ showSuggestionsForQuery(query: string) {
     this.hideSuggestions();
   }
 
-  selectNextSuggestion() {
-    if (this.selectedSuggestionIndex < this.suggestions.length - 1) {
-      this.selectedSuggestionIndex++;
-    } else {
-      this.selectedSuggestionIndex = 0;
-    }
-  }
+  // selectNextSuggestion() {
+  //   if (this.selectedSuggestionIndex < this.suggestions.length - 1) {
+  //     this.selectedSuggestionIndex++;
+  //   } else {
+  //     this.selectedSuggestionIndex = 0;
+  //   }
+  // }
 
-  selectPreviousSuggestion() {
-    if (this.selectedSuggestionIndex > 0) {
-      this.selectedSuggestionIndex--;
-    } else {
-      this.selectedSuggestionIndex = this.suggestions.length - 1;
-    }
-  }
+  // selectPreviousSuggestion() {
+  //   if (this.selectedSuggestionIndex > 0) {
+  //     this.selectedSuggestionIndex--;
+  //   } else {
+  //     this.selectedSuggestionIndex = this.suggestions.length - 1;
+  //   }
+  // }
 
   hideSuggestions() {
     this.showSuggestions = false;
     this.selectedSuggestionIndex = -1;
   }
 
-    onSearch(): void {
+   onSearch(): void {
     if (!this.searchTerm.trim()) return;
 
     this.isLoading = true;
-    this.searchStarted.emit(); // Уведомляем о начале поиска
+    this.searchStarted.emit();
 
     this.rawData.text = this.searchTerm;
     this.searchService.sendData(this.rawData) 
       .subscribe({
-        next: (response) => {
-          console.log(response+ " respomce")
+        next: (response: SearchResponse) => {
+          console.log(response + " response");
           this.isLoading = false;
-          this.searchResults.emit(response); // Отправляем результаты
+          this.searchResults.emit(response);
           this.suggestions = response;
-          console.log(this.suggestions + "suggestions");
+          
+          // Теперь это будет работать
+          console.log(this.suggestions.registry_records, "registry records");
+          
+          if (this.suggestions.registry_records.length > 0) {
+            console.log(this.suggestions.registry_records[0], "first registry record");
+          }
+          
+          console.log(this.suggestions.knowledge_base_articles, "knowledge base articles");
+          console.log(this.suggestions.intents, "intents");
         },
         error: (error) => {
           this.isLoading = false;
           this.searchError.emit('Ошибка при поиске');
+          console.error('Search error:', error);
         }
       });
   }

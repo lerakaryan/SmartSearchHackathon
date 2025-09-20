@@ -10,7 +10,7 @@ import { InfoPageComponent } from "../info-page/info-page.component";
 import { QueryResponseWithId } from '../../models/query-response';
 import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
-import { Hint } from '../../interfaces/hint';
+
 
 @Component({
   selector: 'app-home-page',
@@ -55,21 +55,21 @@ searchResults: any ;
   ];
 
 
- onSearchResults(results: Hint): void {
-    this.searchResults = results;
-     this.searchResults = [{
-    id:1,
-    largeName: "1211",
-    previewText: "fff"
+//  onSearchResults(results: Hint): void {
+//     this.searchResults = results;
+//      this.searchResults = [{
+//     id:1,
+//     largeName: "1211",
+//     previewText: "fff"
 
-  }]
-   this.pageIsChosen = false; 
-  console.log(this.searchResults)
-    this.isSearching = false;
-    this.searchError = '';
-    console.log('Результаты поиска:',  this.searchResults);
+//   }]
+//    this.pageIsChosen = false; 
+//   console.log(this.searchResults)
+//     this.isSearching = false;
+//     this.searchError = '';
+//     console.log('Результаты поиска:',  this.searchResults);
 
-  }
+//   }
 
     // Обработчик начала поиска
   onSearchStarted(): void {

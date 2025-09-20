@@ -1,11 +1,31 @@
 // interfaces/hint.interfaces.ts
 
+export interface SearchResponse {
+  registry_records: RegistryHint[];
+  knowledge_base_articles: KnowledgeBaseHint[];
+  intents: ActionHintIntents;
+}
+
+export interface ActionHintIntents {
+  name: string;
+  entities: {
+    names: string;
+    // добавьте другие поля если необходимо
+  };
+}
+
+export interface RegistryHint {
+  type: 'registry';
+  hintType: 1 | 2;
+  data: RegistryHintType1['data'] | RegistryHintType2['data'];
+}
+
+// Остальные интерфейсы остаются
 export interface BaseHint {
   type: 'registry' | 'knowledge_base' | 'action';
 }
 
-// Реестр - Тип 1 (Контракт)
-export interface RegistryHintType1 extends BaseHint {
+export interface RegistryHintType1 {
   type: 'registry';
   hintType: 1;
   data: {
@@ -22,8 +42,7 @@ export interface RegistryHintType1 extends BaseHint {
   };
 }
 
-// Реестр - Тип 2 (Контрактная система)
-export interface RegistryHintType2 extends BaseHint {
+export interface RegistryHintType2 {
   type: 'registry';
   hintType: 2;
   data: {
@@ -41,25 +60,13 @@ export interface RegistryHintType2 extends BaseHint {
   };
 }
 
-// База знаний
-export interface KnowledgeBaseHint extends BaseHint {
+export interface KnowledgeBaseHint {
   type: 'knowledge_base';
   text: string;
   link: string;
 }
 
-// Действие
-export interface ActionHint extends BaseHint {
+export interface ActionHint {
   type: 'action';
-  intents: {
-    name: string;
-    entities: {
-      dates: string[];
-      money: string[];
-      name: string[];
-      addr: string[];
-    };
-  };
+  intents: ActionHintIntents;
 }
-
-export type Hint = RegistryHintType1 | RegistryHintType2 | KnowledgeBaseHint | ActionHint;

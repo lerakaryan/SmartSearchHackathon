@@ -8,7 +8,6 @@ from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
 from registry_records import UniversalContractSearcher, convert_dataframe_to_json
 import uvicorn
-from spellchecker import SpellChecker
 import re
 
 predictor = IntentPredictor()
@@ -21,7 +20,6 @@ files = [
 
 app = FastAPI(title="Intent & Entity API")
 
-test = SpellChecker(language='ru')
 ask_regex = "( |^)(кто|что|где|когда|почему|как|какие|сколько|зачем|чей|куда|откуда)( |$)|\?.*"
 
 
