@@ -1,1 +1,29 @@
-<p>search-line works!</p>
+<div class="search-container">
+  <div class="search-input-group">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keyup)="onKeyPress($event)"
+      placeholder="Введите текст для поиска..."
+      class="search-input"
+    >
+    
+    <button
+      (click)="onSearch()"
+      class="search-button"
+      [disabled]="!searchTerm"
+    >
+      <span class="search-icon">🔍</span>
+      Поиск
+    </button>
+
+    <button
+      *ngIf="searchTerm"
+      (click)="clearSearch()"
+      class="clear-button"
+      title="Очистить поиск"
+    >
+      ✕
+    </button>
+  </div>
+</div>
