@@ -43,15 +43,15 @@ pageData: PageInfo | null = null;
               return of(null);
             })
           )
-          .subscribe((response: PageInfo | null) => {
-            this.loading = false;
+          // .subscribe((response: PageInfo | null) => {
+          //   this.loading = false;
             
-            if (response && response.items && response.items.length > 0) {
-              this.pageData = response.items[0];
-            } else {
-              this.error = 'Страница не найдена';
-            }
-          });
+          //   if (response && response.items && response.items.length > 0) {
+          //     this.pageData = response.items[0];
+          //   } else {
+          //     this.error = 'Страница не найдена';
+          //   }
+          // });
       } else {
         this.loading = false;
         this.error = 'ID страницы не указан';
