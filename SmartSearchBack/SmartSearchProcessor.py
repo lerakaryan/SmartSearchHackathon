@@ -368,29 +368,13 @@ class IntentClassifier:
         # Если не вопрос, то скорее всего действие
         return "action"
 
-# Пример использования
-if __name__ == "__main__":
-    classifier = IntentClassifier()
-    preprocessor = TextPreprocessor()
+
+class SmartSearchProcessor:
+    def __init__(self):
+        self.classifier = IntentClassifier()  # Атрибут экземпляра
+        self.preprocessor = TextPreprocessor()  # Атрибут экземпляра
     
-    test_phrases = [
-        "сделай кс закупку",
-        "cltkfq rc pfregre",
-        "оформи тендер на поставку",
-        "создай котировочную сессию",
-        "найди контрагента по инн",
-        "покажи мои запки на прямые закупки",  # Здесь есть опечатка "запки"
-        "удали оферту из корзины",
-        "сгенерируй отчет по кс",
-        "хочу пиццы с ананасами"
-    ]
-    
-    for phrase in test_phrases:
-        result = preprocessor.full_preprocess(phrase)
-        print(f"\nТекст: '{result}'")
-        result = classifier.classify_intent(result)
-        print(f"Намерение: {result['intent']}")
-        print(f"Тип: {result['type']}")
-        print(f"Уверенность: {result['confidence']:.2f}")
-        print(f"Метод: {result['method']}")
-        print("-" * 50)
+    def process_query(self, text: str) -> str:
+        result = self.preprocessor.full_preprocess(text)  # Правильно через self
+        result = self.classifier.classify_intent(result)  # Правильно через self
+        return result
