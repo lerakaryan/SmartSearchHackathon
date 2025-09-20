@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchServiceService } from '../../services/search-service/search-service.service';
 import { RawData } from '../../interfaces/rawData';
 import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
+import { Hint } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-search-line',
@@ -14,9 +15,9 @@ import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
 export class SearchLineComponent {
   searchTerm: string = '';
   isLoading: boolean = false;
-rawData: RawData = { query: '' };
+rawData: RawData = { text: '' };
  showSuggestions: boolean = false;
-  suggestions: any[] = [];
+  suggestions: Hint[] = [];
   @Output() searchResults = new EventEmitter<any>();
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
@@ -71,8 +72,10 @@ rawData: RawData = { query: '' };
 
   
 showSuggestionsForQuery(query: string) {
-  const results = this.getSearchResults(query);
-  this.suggestions = results.slice(0, 3); // ← ЭТОЙ СТРОКИ НЕ БЫЛО!
+  this.onSearch();
+  console.log(this.suggestions + "faadfaf");
+ 
+
   console.log('Найдены подсказки:', this.suggestions);
   this.showSuggestions = this.suggestions.length > 0;
   this.selectedSuggestionIndex = -1;
@@ -111,13 +114,15 @@ showSuggestionsForQuery(query: string) {
     this.isLoading = true;
     this.searchStarted.emit(); // Уведомляем о начале поиска
 
-    this.rawData.query = this.searchTerm;
+    this.rawData.text = this.searchTerm;
     this.searchService.sendData(this.rawData) 
       .subscribe({
         next: (response) => {
-          
+          console.log(response+ " respomce")
           this.isLoading = false;
           this.searchResults.emit(response); // Отправляем результаты
+          this.suggestions = response;
+          console.log(this.suggestions + "suggestions");
         },
         error: (error) => {
           this.isLoading = false;
@@ -142,24 +147,24 @@ showSuggestionsForQuery(query: string) {
 
    clearSearch(): void {
     this.searchTerm = '';
-    this.rawData.query = ''; // очищаем и rawData
+    this.rawData.text = ''; // очищаем и rawData
     this.searchResults.emit(null);
   }
 
-    private getSearchResults(query: string): any[] {
-    // Замените на реальный API вызов
-    const mockData = [
-      { id: 1, largeName: "Angular разработка", previewText: "Руководство по Angular разработке" },
-      { id: 2, largeName: "React vs Angular", previewText: "Сравнение фреймворков 2024" },
-      { id: 3, largeName: "JavaScript основы", previewText: "Основы JavaScript для начинающих" },
-      { id: 4, largeName: "TypeScript преимущества", previewText: "Почему выбирают TypeScript" },
-      { id: 5, largeName: "Веб разработка 2024", previewText: "Новые тренды веб разработки" }
-    ];
+    // private getSearchResults(query: string): any[] {
+    // // Замените на реальный API вызов
+    // const mockData = [
+    //   { id: 1, largeName: "Angular разработка", previewText: "Руководство по Angular разработке" },
+    //   { id: 2, largeName: "React vs Angular", previewText: "Сравнение фреймворков 2024" },
+    //   { id: 3, largeName: "JavaScript основы", previewText: "Основы JavaScript для начинающих" },
+    //   { id: 4, largeName: "TypeScript преимущества", previewText: "Почему выбирают TypeScript" },
+    //   { id: 5, largeName: "Веб разработка 2024", previewText: "Новые тренды веб разработки" }
+    // ];
 
-   return mockData.filter(item => 
-      item.largeName.toLowerCase().includes(query.toLowerCase()) ||
-      item.previewText.toLowerCase().includes(query.toLowerCase())
-    );
-  }
+  //  return mockData.filter(item => 
+  //     item.largeName.toLowerCase().includes(query.toLowerCase()) ||
+  //     item.previewText.toLowerCase().includes(query.toLowerCase())
+  //   );
+  // }
 
 }
