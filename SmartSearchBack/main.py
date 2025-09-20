@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import requests
 from fastapi import FastAPI
@@ -51,7 +51,7 @@ class IntentEntity(BaseModel):
 class PredictionResponse(BaseModel):
     registry_records: List[RegistryRecord]
     knowledge_base_articles: List[List[str]]
-    intents: IntentEntity
+    intents: Optional[IntentEntity] = None
 
 
 def knowledge_base_search(text: str) -> List[List[str]]:
