@@ -19,6 +19,14 @@ files = [
 
 app = FastAPI(title="Intent & Entity API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:3000"],  # Разрешенные origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешенные HTTP методы
+    allow_headers=["*"],  # Разрешенные заголовки
+)
+
 
 class TextRequest(BaseModel):
     text: str

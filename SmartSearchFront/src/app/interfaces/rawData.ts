@@ -1,4 +1,4 @@
 export interface RawData
 {
-    query: string;
+    text: string;
 }

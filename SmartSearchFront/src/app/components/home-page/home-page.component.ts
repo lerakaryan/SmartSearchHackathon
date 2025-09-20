@@ -4,16 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http'; // ← Добавьте эту строку
 import { SearchServiceService } from '../../services/search-service/search-service.service';
-import { PageInfo } from '../../interfaces/pageInfo';
+
 import { Router } from '@angular/router';
 import { InfoPageComponent } from "../info-page/info-page.component";
 import { QueryResponseWithId } from '../../models/query-response';
 import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
+import { Hint } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-home-page',
-  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, InfoPageComponent, RatingButtonComponent,
+  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, RatingButtonComponent,
     QueryResponseTableComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
@@ -54,7 +55,7 @@ searchResults: any ;
   ];
 
 
- onSearchResults(results: PageInfo): void {
+ onSearchResults(results: Hint): void {
     this.searchResults = results;
      this.searchResults = [{
     id:1,
