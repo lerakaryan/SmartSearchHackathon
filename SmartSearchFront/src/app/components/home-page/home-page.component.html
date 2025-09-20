@@ -1,48 +1,13 @@
 <div class="homepage">
-  <!-- Поисковая строка -->
-  <app-search-line 
-    (searchResults)="onSearchResults($event)"
-    (searchStarted)="onSearchStarted()"
-    (searchError)="onSearchError($event)"
-  ></app-search-line>
-
-  <!-- Индикатор загрузки -->
-  <div *ngIf="isSearching" class="loading">
-    ⏳ Идет поиск...
+  <!-- Только поисковая строка -->
+  <div class="search-section">
+    <app-search-line 
+      (suggestionSelected)="onSuggestionSelected($event)"
+    ></app-search-line>
   </div>
 
-  <!-- Сообщение об ошибке -->
-  <div *ngIf="searchError" class="error">
-    ❌ {{ searchError }}
+  <!-- Только выбранная статья -->
+  <div *ngIf="pageIsChosen" class="article-section">
+    <app-info-page [pageId]="selectedPageId"></app-info-page>
   </div>
-
-  <!-- Другие компоненты, которые получат результаты -->
-  
-<div *ngIf="searchResults && searchResults.length > 0 &&!pageIsChosen" class="search-results">
-  <h3 class="results-title">Найдено результатов: {{ searchResults.length }}</h3>
-  
-  <div class="results-grid">
-    <div *ngFor="let result of searchResults" class="result-card">
-      <a 
-        (click)="onArticleClick(result.id)"
-      >
-        <h4 class="result-title">{{ result.largeName }}</h4>
-      </a>
-      
-      <p class="result-preview">{{ result.previewText  }}</p>
-      
-      <div class="result-footer">
-        <span class="result-id">ID: {{ result.id }}</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div  *ngIf="pageIsChosen">
-
-  <app-info-page [pageId]="selectedPageId"></app-info-page>
-
-</div>
-
-
 </div>

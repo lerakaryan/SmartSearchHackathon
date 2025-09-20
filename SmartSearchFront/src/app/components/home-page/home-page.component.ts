@@ -20,6 +20,13 @@ import { InfoPageComponent } from "../info-page/info-page.component";
 export class HomePageComponent {
 
 
+ 
+
+  onSuggestionSelected(suggestion: any) {
+    this.pageIsChosen = true;
+    this.selectedPageId = suggestion.id;
+    console.log('Выбрана статья:', suggestion);
+  }
 onArticleClick(pageId: number) {
 this.pageIsChosen = true;
     this.selectedPageId = pageId;
@@ -63,4 +70,7 @@ searchResults: any ;
     this.searchError = error;
     this.isSearching = false;
   }
+
+
+ 
 }
