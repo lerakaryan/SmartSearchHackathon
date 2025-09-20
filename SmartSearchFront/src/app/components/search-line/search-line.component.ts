@@ -30,6 +30,7 @@ rawData: RawData = { data: '' };
     this.searchService.sendData(this.rawData) 
       .subscribe({
         next: (response) => {
+          
           this.isLoading = false;
           this.searchResults.emit(response); // Отправляем результаты
         },

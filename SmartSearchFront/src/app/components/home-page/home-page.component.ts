@@ -23,9 +23,10 @@ searchResults: any = null;
 
  onSearchResults(results: PageInfo): void {
     this.searchResults = results;
+     
     this.isSearching = false;
     this.searchError = '';
-    console.log('Результаты поиска:', results);
+    console.log('Результаты поиска:',  this.searchResults);
 
   }
 
