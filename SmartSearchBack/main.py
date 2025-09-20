@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 
+import requests
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
@@ -8,7 +9,6 @@ from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
 from registry_records import UniversalContractSearcher, convert_dataframe_to_json
 import uvicorn
-from spellchecker import SpellChecker
 import re
 
 predictor = IntentPredictor()
@@ -21,7 +21,6 @@ files = [
 
 app = FastAPI(title="Intent & Entity API")
 
-test = SpellChecker(language='ru')
 ask_regex = "( |^)(кто|что|где|когда|почему|как|какие|сколько|зачем|чей|куда|откуда)( |$)|\?.*"
 
 
@@ -56,10 +55,20 @@ class PredictionResponse(BaseModel):
 
 
 def knowledge_base_search(text: str) -> List[List[str]]:
-    return [
-        ["Как создать нового пользователя ?", "213981"],
-        ["Как добавить учетную запись", "214532"]
-    ]
+    url = "https://zakupki.mos.ru/newapi/api/KnowledgeBase/GetArticlesPreview"
+    query = {"filter": {"textPattern": text}}
+    resp = requests.get(url, params={"query": str(query)})
+    resp.raise_for_status()
+    data = resp.json()
+
+    results = []
+    for item in data.get("items", []):
+        name = item.get("largeName", "")
+        static_id = item.get("staticId")
+        if static_id:
+            article_url = f"https://zakupki.mos.ru/knowledgebase/articles/{static_id}"
+            results.append([name, article_url])
+    return results
 
 
 def intent_prediction(text: str) -> IntentEntity:
@@ -72,6 +81,8 @@ def intent_prediction(text: str) -> IntentEntity:
 @app.post("/predict", response_model=PredictionResponse)
 def predict_intent(request: TextRequest):
     knowledge_base_articles = []
+    registry_records = []
+    intents = None
 
     text = request.text
 
@@ -79,14 +90,12 @@ def predict_intent(request: TextRequest):
     is_question = re.search(ask_regex, text.lower())
 
     if is_question:
-        knowledge_base_articles = knowledge_base_search(text)
+        knowledge_base_articles = knowledge_base_search(text)[:2]
+    else:
+        if len(text) >= 3:
+            registry_records = convert_dataframe_to_json(registry.search_in_files(files, request.text))
 
-    #### сделать
-    registry_records = convert_dataframe_to_json(registry.search_in_files(files, request.text))
-    print(registry_records)
-    #### сделать
-
-    intents = intent_prediction(text)
+        intents = intent_prediction(text)
 
     return PredictionResponse(
         registry_records=registry_records,
