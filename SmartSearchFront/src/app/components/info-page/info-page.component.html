@@ -1,1 +1,25 @@
-<p>info-page works!</p>
+<div class="article-container">
+  <div *ngIf="loading" class="loading">
+    ⏳ Загрузка статьи...
+  </div>
+
+  <div *ngIf="error" class="error">
+    ❌ {{ error }}
+  </div>
+
+  <div *ngIf="pageInfo && !loading" class="article-content">
+    <h1 class="article-title">{{ pageInfo.largeName }}</h1>
+    
+    <div class="article-preview">
+      {{ pageInfo.previewText }}
+    </div>
+    
+    <div class="article-detail">
+      {{ pageInfo.detailText }}
+    </div>
+    
+    <div class="article-meta">
+      <span class="article-id">ID: {{ pageInfo.id }}</span>
+    </div>
+  </div>
+</div>

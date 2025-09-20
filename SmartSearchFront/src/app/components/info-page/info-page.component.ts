@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageInfo } from '../../interfaces/pageInfo';
 import { ActivatedRoute } from '@angular/router';
@@ -14,25 +14,23 @@ import { SearchServiceService } from '../../services/search-service/search-servi
   styleUrl: './info-page.component.css'
 })
 export class InfoPageComponent {
-pageData!: PageInfo ;
+pageInfo!: PageInfo ;
   loading: boolean = false;
   error: string | null = null;
-  
+    @Input() pageId: number | null = null;
  constructor(
     private route: ActivatedRoute,
     private searchService: SearchServiceService
   ) {}
 
    ngOnInit(): void {
+    this.loadPageData();
    }
 
-<<<<<<< HEAD
-  
-=======
    loadPageData(): void {
     this.loading = true;
     this.error = null;
-
+console.log("всё норм");
     // this.route.params.subscribe(params => {
     //   const pageId = params['id'];
       
@@ -61,5 +59,4 @@ pageData!: PageInfo ;
     //   }
     // });
   }
->>>>>>> 5cf68598f3f5fafd3d4f145e36ff0be6d7deb588
 }

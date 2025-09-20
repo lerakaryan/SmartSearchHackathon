@@ -18,16 +18,31 @@
 
   <!-- Другие компоненты, которые получат результаты -->
   
-<div *ngIf="searchResults && searchResults.length > 0" class="search-results">
-    <h3>Найдено результатов: {{ searchResults.length }}</h3>
-    
-    <div *ngFor="let result of searchResults" class="result-item">
-      <h4>{{ result.largeName }}</h4>
-      <p class="preview">{{ result.previewText }}</p>
-      <p class="detail">{{ result.detailText }}</p>
-      <small>ID: {{ result.id }}</small>
+<div *ngIf="searchResults && searchResults.length > 0 &&!pageIsChosen" class="search-results">
+  <h3 class="results-title">Найдено результатов: {{ searchResults.length }}</h3>
+  
+  <div class="results-grid">
+    <div *ngFor="let result of searchResults" class="result-card">
+      <a 
+        (click)="onArticleClick(result.id)"
+      >
+        <h4 class="result-title">{{ result.largeName }}</h4>
+      </a>
+      
+      <p class="result-preview">{{ result.previewText  }}</p>
+      
+      <div class="result-footer">
+        <span class="result-id">ID: {{ result.id }}</span>
+      </div>
     </div>
   </div>
+</div>
+
+<div  *ngIf="pageIsChosen">
+
+  <app-info-page [pageId]="selectedPageId"></app-info-page>
+
+</div>
 
 
 </div>

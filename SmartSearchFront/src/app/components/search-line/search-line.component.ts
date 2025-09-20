@@ -13,7 +13,7 @@ import { RawData } from '../../interfaces/rawData';
 export class SearchLineComponent {
   searchTerm: string = '';
   isLoading: boolean = false;
-rawData: RawData = { data: '' };
+rawData: RawData = { query: '' };
   @Output() searchResults = new EventEmitter<any>();
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
@@ -26,7 +26,7 @@ rawData: RawData = { data: '' };
     this.isLoading = true;
     this.searchStarted.emit(); // Уведомляем о начале поиска
 
-    this.rawData.data = this.searchTerm;
+    this.rawData.query = this.searchTerm;
     this.searchService.sendData(this.rawData) 
       .subscribe({
         next: (response) => {
@@ -49,7 +49,7 @@ rawData: RawData = { data: '' };
 
    clearSearch(): void {
     this.searchTerm = '';
-    this.rawData.data = ''; // очищаем и rawData
+    this.rawData.query = ''; // очищаем и rawData
     this.searchResults.emit(null);
   }
 }
