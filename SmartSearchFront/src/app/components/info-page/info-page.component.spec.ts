@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResultComponent } from './result.component';
+import { InfoPageComponent } from './info-page.component';
 
-describe('ResultComponent', () => {
-  let component: ResultComponent;
-  let fixture: ComponentFixture<ResultComponent>;
+describe('InfoPageComponent', () => {
+  let component: InfoPageComponent;
+  let fixture: ComponentFixture<InfoPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResultComponent]
+      imports: [InfoPageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ResultComponent);
+    fixture = TestBed.createComponent(InfoPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
