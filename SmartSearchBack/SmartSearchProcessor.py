@@ -6,7 +6,7 @@ from symspellpy import SymSpell, Verbosity
 import pkg_resources
 from pymorphy3 import MorphAnalyzer
 from nltk.corpus import stopwords
-import nltk
+
 
 class TextPreprocessor:
     def __init__(self):

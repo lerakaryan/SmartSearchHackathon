@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http'; // ← Добавьте эту строку
 import { SearchServiceService } from '../../services/search-service/search-service.service';
+import { PageInfo } from '../../interfaces/pageInfo';
 
 @Component({
   selector: 'app-home-page',
@@ -20,11 +21,12 @@ searchResults: any = null;
   searchError: string = '';
 
 
- onSearchResults(results: any): void {
+ onSearchResults(results: PageInfo): void {
     this.searchResults = results;
+     
     this.isSearching = false;
     this.searchError = '';
-    console.log('Результаты поиска:', results);
+    console.log('Результаты поиска:',  this.searchResults);
 
   }
 

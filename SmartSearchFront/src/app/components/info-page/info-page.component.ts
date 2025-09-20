@@ -14,7 +14,7 @@ import { SearchServiceService } from '../../services/search-service/search-servi
   styleUrl: './info-page.component.css'
 })
 export class InfoPageComponent {
-pageData: PageInfo | null = null;
+pageData!: PageInfo ;
   loading: boolean = false;
   error: string | null = null;
   
@@ -24,9 +24,11 @@ pageData: PageInfo | null = null;
   ) {}
 
    ngOnInit(): void {
-    this.loadPageData();
-  }
+   }
 
+<<<<<<< HEAD
+  
+=======
    loadPageData(): void {
     this.loading = true;
     this.error = null;
@@ -59,4 +61,5 @@ pageData: PageInfo | null = null;
     //   }
     // });
   }
+>>>>>>> 5cf68598f3f5fafd3d4f145e36ff0be6d7deb588
 }
