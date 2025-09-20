@@ -4,7 +4,7 @@ import { environment } from '../../environments/environment';
 import { RawData } from '../../interfaces/rawData';
 
 import { Observable } from 'rxjs';
-import { Hint } from '../../interfaces/hint';
+import { SearchResponse } from '../../interfaces/hint';
 
 
 @Injectable({
@@ -15,15 +15,15 @@ private apiUrl = environment.apiUrl +'/predict';
 http = inject(HttpClient);
   constructor() { }
 
-  sendData(rawData: RawData): Observable<Hint[]>
+  sendData(rawData: RawData)
   {
     console.log(rawData);
-    return this.http.post<Hint[]>(this.apiUrl, rawData); //тут ответ список статей
+    return this.http.post<SearchResponse>(this.apiUrl, rawData); //тут ответ список статей
   }
 
-  getPageById(id: number): Observable<Hint>
+  getPageById(id: number): Observable<SearchResponse>
 {
-return this.http.get<Hint>(this.apiUrl+'/'+id);
+return this.http.get<SearchResponse>(this.apiUrl+'/'+id);
 }
 
 }
