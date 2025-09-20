@@ -4,10 +4,18 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
+from registry_records import UniversalContractSearcher, convert_dataframe_to_json
 import uvicorn
+import pandas as pd
+import json
 
 predictor = IntentPredictor()
 extractor = EntityExtractor()
+registry = UniversalContractSearcher()
+files = [
+    "Контракты_ПП_Тендерхак_20250919.xlsx",
+    "Котировочные сессии_ПП_Тендерхак_20250919.xlsx"
+]
 
 app = FastAPI(title="Intent & Entity API")
 
@@ -67,7 +75,7 @@ def predict_intent(request: TextRequest):
 
 
     #### сделать
-    registry_records = registry_search(request.text)
+    registry_records = convert_dataframe_to_json(registry.search_in_files(files, request.text))
 
     #### сделать
     knowledge_base_articles = knowledge_base_search(request.text)
@@ -108,3 +116,4 @@ def predict_intent(request: TextRequest):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
