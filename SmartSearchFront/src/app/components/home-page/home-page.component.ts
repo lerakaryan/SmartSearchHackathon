@@ -24,6 +24,13 @@ import { QueryResponseTableComponent } from '../query-response-table';
 export class HomePageComponent {
 
 
+ 
+
+  onSuggestionSelected(suggestion: any) {
+    this.pageIsChosen = true;
+    this.selectedPageId = suggestion.id;
+    console.log('Выбрана статья:', suggestion);
+  }
 onArticleClick(pageId: number) {
 this.pageIsChosen = true;
     this.selectedPageId = pageId;
