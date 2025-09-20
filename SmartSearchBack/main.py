@@ -2,14 +2,22 @@ from typing import List, Dict, Any
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
+
 from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
+from registry_records import UniversalContractSearcher, convert_dataframe_to_json
 import uvicorn
 from spellchecker import SpellChecker
 import re
 
 predictor = IntentPredictor()
 extractor = EntityExtractor()
+registry = UniversalContractSearcher()
+files = [
+    "Контракты_ПП_Тендерхак_20250919.xlsx",
+    "Котировочные сессии_ПП_Тендерхак_20250919.xlsx"
+]
 
 app = FastAPI(title="Intent & Entity API")
 
@@ -20,6 +28,14 @@ def correction(text):
     words = text.split(" ")
     corrected_words = [test.correction(word) for word in words]
     return " ".join(corrected_words)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:3000"],  # Разрешенные origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешенные HTTP методы
+    allow_headers=["*"],  # Разрешенные заголовки
+)
 
 
 class TextRequest(BaseModel):
@@ -61,6 +77,7 @@ def intent_prediction(text: str) -> IntentEntity:
             name=predictor.predict(text)[0],
             entities=extractor.extract(text)
         )
+
 
 
 @app.post("/predict", response_model=PredictionResponse)
@@ -119,3 +136,4 @@ def predict_intent(request: TextRequest):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
