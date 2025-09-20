@@ -26,5 +26,40 @@ pageData!: PageInfo ;
    ngOnInit(): void {
    }
 
+<<<<<<< HEAD
   
+=======
+   loadPageData(): void {
+    this.loading = true;
+    this.error = null;
+
+    // this.route.params.subscribe(params => {
+    //   const pageId = params['id'];
+      
+    //   // if (pageId) {
+    //   //   this.pageDataService.getPageById(+pageId)
+    //   //     .pipe(
+    //   //       catchError(error => {
+    //   //         this.loading = false;
+    //   //         this.error = 'Ошибка загрузки страницы';
+    //   //         console.error('Error loading page:', error);
+    //   //         return of(null);
+    //   //       })
+    //   //     )
+    //       // .subscribe((response: PageInfo | null) => {
+    //       //   this.loading = false;
+            
+    //       //   if (response && response.items && response.items.length > 0) {
+    //       //     this.pageData = response.items[0];
+    //       //   } else {
+    //       //     this.error = 'Страница не найдена';
+    //       //   }
+    //       // });
+    //   } else {
+    //     this.loading = false;
+    //     this.error = 'ID страницы не указан';
+    //   }
+    // });
+  }
+>>>>>>> 5cf68598f3f5fafd3d4f145e36ff0be6d7deb588
 }

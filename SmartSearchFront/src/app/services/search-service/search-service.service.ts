@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SearchServiceService {
-private apiUrl = environment.apiUrl +'/pages';
+private apiUrl = environment.apiUrl +'/search';
 http = inject(HttpClient);
   constructor() { }
 
