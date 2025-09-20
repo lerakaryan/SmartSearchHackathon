@@ -1,13 +1,65 @@
 <div class="homepage">
-  <!-- Только поисковая строка -->
-  <div class="search-section">
-    <app-search-line 
-      (suggestionSelected)="onSuggestionSelected($event)"
-    ></app-search-line>
+  <!-- кнопка открыть историю -->
+  <app-rating-button 
+    (buttonClick)="onRatingButtonClick()"
+    class="rating-button"
+  ></app-rating-button>
+
+  <!-- Поисковая строка -->
+  <app-search-line 
+    (searchResults)="onSearchResults($event)"
+    (searchStarted)="onSearchStarted()"
+    (searchError)="onSearchError($event)"
+  ></app-search-line>
+
+  <!-- Индикатор загрузки -->
+  <div *ngIf="isSearching" class="loading">
+    ⏳ Идет поиск...
   </div>
 
-  <!-- Только выбранная статья -->
-  <div *ngIf="pageIsChosen" class="article-section">
-    <app-info-page [pageId]="selectedPageId"></app-info-page>
+  <!-- Сообщение об ошибке -->
+  <div *ngIf="searchError" class="error">
+    ❌ {{ searchError }}
   </div>
+
+  <!-- Другие компоненты, которые получат результаты -->
+  
+<div *ngIf="searchResults && searchResults.length > 0 &&!pageIsChosen" class="search-results">
+  <h3 class="results-title">Найдено результатов: {{ searchResults.length }}</h3>
+  
+  <div class="results-grid">
+    <div *ngFor="let result of searchResults" class="result-card">
+      <a 
+        (click)="onArticleClick(result.id)"
+      >
+        <h4 class="result-title">{{ result.largeName }}</h4>
+      </a>
+      
+      <p class="result-preview">{{ result.previewText  }}</p>
+      
+      <div class="result-footer">
+        <span class="result-id">ID: {{ result.id }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Модальное окно с таблицей оценок -->
+  <div *ngIf="showRatingTable" class="rating-overlay">
+    <div class="rating-modal">
+      <div class="modal-header">
+        <h2>Оценка ответов</h2>
+        <button class="close-button" (click)="showRatingTable = false">✕</button>
+      </div>
+      <div class="modal-content">
+        <app-query-response-table
+          [data]="queryResponses"
+          (ratingChange)="onRatingChange($event)"
+        ></app-query-response-table>
+      </div>
+    </div>
+  </div>
+
 </div>

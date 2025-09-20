@@ -1,0 +1,44 @@
+<!-- query-response-table.component.html -->
+<div class="table-container">
+  <table class="query-response-table">
+    <thead>
+      <tr>
+        <th>Запрос</th>
+        <th>Ответ</th>
+        <th>Оценка</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data; trackBy: trackByFn" class="table-row">
+        <td class="query-cell">{{ item.query }}</td>
+        <td class="response-cell">{{ item.response }}</td>
+        <td class="rating-cell">
+          <span *ngIf="item.rating > 0" class="rating-display">
+            {{ item.rating }}
+          </span>
+          <span *ngIf="item.rating === 0" class="no-rating">
+            Нет оценки
+          </span>
+        </td>
+        <td class="actions-cell">
+          <div *ngIf="item.rating === 0; else ratedTemplate">
+            <select 
+              #ratingSelect
+              (change)="onRatingChange(item, ratingSelect.value)"
+              class="rating-select"
+            >
+              <option value="">Выберите оценку</option>
+              <option *ngFor="let rating of ratings" [value]="rating">
+                {{ rating }}
+              </option>
+            </select>
+          </div>
+          <ng-template #ratedTemplate>
+            <span class="rated-text">Оценено</span>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
