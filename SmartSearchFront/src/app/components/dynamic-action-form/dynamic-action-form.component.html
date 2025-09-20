@@ -1,0 +1,85 @@
+<div class="dynamic-form-container" *ngIf="!isLoading && actionConfig">
+  <div class="form-header">
+    <h2>{{ actionConfig.title }}</h2>
+    <p class="description">{{ actionConfig.description }}</p>
+  </div>
+
+  <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" class="dynamic-form">
+    <div class="form-fields">
+      <div *ngFor="let field of actionConfig.fields" class="form-field">
+        <label [for]="field.key">{{ field.label }}{{ field.required ? ' *' : '' }}</label>
+        
+        <!-- Текстовое поле -->
+        <input 
+          *ngIf="field.type === 'text' || field.type === 'email' || field.type === 'number'"
+          [id]="field.key"
+          [type]="field.type"
+          [formControlName]="field.key"
+          [class.invalid]="isFieldInvalid(field.key)"
+          [placeholder]="'Введите ' + field.label.toLowerCase()"
+        />
+
+        <!-- Textarea -->
+        <textarea 
+          *ngIf="field.type === 'textarea'"
+          [id]="field.key"
+          [formControlName]="field.key"
+          [class.invalid]="isFieldInvalid(field.key)"
+          [placeholder]="'Введите ' + field.label.toLowerCase()"
+          rows="4"
+        ></textarea>
+
+        <!-- Дата -->
+        <input 
+          *ngIf="field.type === 'date'"
+          [id]="field.key"
+          type="date"
+          [formControlName]="field.key"
+          [class.invalid]="isFieldInvalid(field.key)"
+        />
+
+        <!-- Файл -->
+        <input 
+          *ngIf="field.type === 'file'"
+          [id]="field.key"
+          type="file"
+          (change)="onFileChange($event, field.key)"
+          [class.invalid]="isFieldInvalid(field.key)"
+        />
+
+        <!-- Select -->
+        <select 
+          *ngIf="field.type === 'select' && field.options"
+          [id]="field.key"
+          [formControlName]="field.key"
+          [class.invalid]="isFieldInvalid(field.key)"
+        >
+          <option value="">Выберите опцию</option>
+          <option *ngFor="let option of field.options" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+
+        <!-- Сообщения об ошибках -->
+        <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+          <span *ngIf="dynamicForm.get(field.key)?.errors?.['required']">
+            Это поле обязательно для заполнения
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Отмена
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="dynamicForm.invalid">
+        Сохранить
+      </button>
+    </div>
+  </form>
+</div>
+
+<div *ngIf="isLoading" class="loading">
+  Загрузка формы...
+</div>
