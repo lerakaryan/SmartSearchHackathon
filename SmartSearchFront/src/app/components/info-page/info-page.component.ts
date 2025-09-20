@@ -3,8 +3,9 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageInfo } from '../../interfaces/pageInfo';
 import { ActivatedRoute } from '@angular/router';
-import { PageDataService } from '../../services/page-data/page-data.service';
+
 import { catchError, of } from 'rxjs';
+import { SearchServiceService } from '../../services/search-service/search-service.service';
 
 @Component({
   selector: 'app-info-page',
@@ -19,7 +20,7 @@ pageData: PageInfo | null = null;
   
  constructor(
     private route: ActivatedRoute,
-    private pageDataService: PageDataService
+    private searchService: SearchServiceService;
   ) {}
 
    ngOnInit(): void {
