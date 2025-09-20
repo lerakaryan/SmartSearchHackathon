@@ -8,7 +8,7 @@ import { RawData } from '../../interfaces/rawData';
   providedIn: 'root'
 })
 export class SearchServiceService {
-private apiUrl = environment.apiUrl +'/pages';
+private apiUrl = environment.apiUrl +'/search';
 http = inject(HttpClient);
   constructor() { }
 

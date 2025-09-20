@@ -20,7 +20,7 @@ pageData: PageInfo | null = null;
   
  constructor(
     private route: ActivatedRoute,
-    private searchService: SearchServiceService;
+    private searchService: SearchServiceService
   ) {}
 
    ngOnInit(): void {
@@ -31,32 +31,32 @@ pageData: PageInfo | null = null;
     this.loading = true;
     this.error = null;
 
-    this.route.params.subscribe(params => {
-      const pageId = params['id'];
+    // this.route.params.subscribe(params => {
+    //   const pageId = params['id'];
       
-      if (pageId) {
-        this.pageDataService.getPageById(+pageId)
-          .pipe(
-            catchError(error => {
-              this.loading = false;
-              this.error = 'Ошибка загрузки страницы';
-              console.error('Error loading page:', error);
-              return of(null);
-            })
-          )
-          // .subscribe((response: PageInfo | null) => {
-          //   this.loading = false;
+    //   // if (pageId) {
+    //   //   this.pageDataService.getPageById(+pageId)
+    //   //     .pipe(
+    //   //       catchError(error => {
+    //   //         this.loading = false;
+    //   //         this.error = 'Ошибка загрузки страницы';
+    //   //         console.error('Error loading page:', error);
+    //   //         return of(null);
+    //   //       })
+    //   //     )
+    //       // .subscribe((response: PageInfo | null) => {
+    //       //   this.loading = false;
             
-          //   if (response && response.items && response.items.length > 0) {
-          //     this.pageData = response.items[0];
-          //   } else {
-          //     this.error = 'Страница не найдена';
-          //   }
-          // });
-      } else {
-        this.loading = false;
-        this.error = 'ID страницы не указан';
-      }
-    });
+    //       //   if (response && response.items && response.items.length > 0) {
+    //       //     this.pageData = response.items[0];
+    //       //   } else {
+    //       //     this.error = 'Страница не найдена';
+    //       //   }
+    //       // });
+    //   } else {
+    //     this.loading = false;
+    //     this.error = 'ID страницы не указан';
+    //   }
+    // });
   }
 }
