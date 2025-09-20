@@ -24,10 +24,6 @@ app = FastAPI(title="Intent & Entity API")
 test = SpellChecker(language='ru')
 ask_regex = "( |^)(кто|что|где|когда|почему|как|какие|сколько|зачем|чей|куда|откуда)( |$)|\?.*"
 
-def correction(text):
-    words = text.split(" ")
-    corrected_words = [test.correction(word) for word in words]
-    return " ".join(corrected_words)
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +40,8 @@ class TextRequest(BaseModel):
 
 class RegistryRecord(BaseModel):
     type: str
-    data: List[str]
+    hintType: int
+    data: Dict[str, str]
 
 
 class IntentEntity(BaseModel):
@@ -58,13 +55,6 @@ class PredictionResponse(BaseModel):
     intents: IntentEntity
 
 
-def registry_search(text: str) -> List[RegistryRecord]:
-    return [
-        RegistryRecord(type="кс", data=[text]),
-        RegistryRecord(type="контракт", data=[f"Обработанный: {text}"])
-    ]
-
-
 def knowledge_base_search(text: str) -> List[List[str]]:
     return [
         ["Как создать нового пользователя ?", "213981"],
@@ -74,19 +64,16 @@ def knowledge_base_search(text: str) -> List[List[str]]:
 
 def intent_prediction(text: str) -> IntentEntity:
     return IntentEntity(
-            name=predictor.predict(text)[0],
-            entities=extractor.extract(text)
-        )
-
+        name=predictor.predict(text)[0],
+        entities=extractor.extract(text)
+    )
 
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict_intent(request: TextRequest):
-
     knowledge_base_articles = []
 
-    ## correction
-    text = correction(request)
+    text = request.text
 
     #### regex
     is_question = re.search(ask_regex, text.lower())
@@ -95,10 +82,9 @@ def predict_intent(request: TextRequest):
         knowledge_base_articles = knowledge_base_search(text)
 
     #### сделать
-    registry_records = registry_search(text)
-
+    registry_records = convert_dataframe_to_json(registry.search_in_files(files, request.text))
+    print(registry_records)
     #### сделать
-
 
     intents = intent_prediction(text)
 
@@ -112,28 +98,27 @@ def predict_intent(request: TextRequest):
 @app.post("/predict_mock", response_model=PredictionResponse)
 def predict_intent(request: TextRequest):
     mock = {
-          "registry_records": [
+        "registry_records": [
             {"type": "кс", "data": ["id name бла бла"]},
             {"type": "контракт", "data": ["id namr бла бла"]}
-          ],
-          "knowledge_base_articles": [
+        ],
+        "knowledge_base_articles": [
             ["Как создать нового пользователя ?", '213981'],
             ["Как добавить учетную запись", '214532']
-          ],
-          "intents": {
-              "name": "создание контракта",
-              "entities": {
+        ],
+        "intents": {
+            "name": "создание контракта",
+            "entities": {
                 "dates": ["2025-09-20"],
                 "money": ["300 тыс."],
                 "name": ["канцелярские товары"],
                 "addr": ["Москва"]
-              }
-          }
+            }
         }
+    }
 
     return mock
 
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
