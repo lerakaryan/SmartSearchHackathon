@@ -31,9 +31,11 @@ export class HomePageComponent implements OnInit {
   isSearching: boolean = false;
   currentQuery: string = '';
   isSomethingChoosen: boolean = false;
-  somethingToDisplay: any = null;
-   onJsonGenerated(data: any) {
-    this.somethingToDisplay = data;
+  currentJson: any = null;
+
+   onJsonGenerated(jsonData: any) {
+    this.currentJson = jsonData;
+    this.isSomethingChoosen= true;
   }
 
 

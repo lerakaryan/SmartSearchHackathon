@@ -105,7 +105,6 @@ class UniversalContractSearcher:
                     df = pd.read_excel(file_path, sheet_name=sheet_name)
                     is_ks_data = 'ID КС' in df.columns
                     
-                    # Проверяем, соответствует ли тип данных запросу
                     if parsed_query['document_type'] == 'ks' and not is_ks_data:
                         continue
                     if parsed_query['document_type'] == 'contract' and is_ks_data:
@@ -128,7 +127,6 @@ class UniversalContractSearcher:
                     if not results.empty:
                         results['Тип документа'] = 'КС' if is_ks_data else 'Контракт'
                         
-                        # Разделяем результаты по типам
                         if is_ks_data:
                             ks_results.append(results)
                         else:
@@ -137,7 +135,6 @@ class UniversalContractSearcher:
             except Exception as e:
                 print(f"Ошибка при обработке файла {file_path}: {e}")
 
-        # Создаем отдельные датафреймы для каждого типа
         ks_df = pd.concat(ks_results, ignore_index=True) if ks_results else pd.DataFrame()
         contract_df = pd.concat(contract_results, ignore_index=True) if contract_results else pd.DataFrame()
         
@@ -206,7 +203,6 @@ def convert_dataframes_to_json(results_list):
     def get_value_safe(row, index, default=''):
         """Безопасное получение значения по индексу с обработкой исключений"""
         try:
-            # Проверяем, что индекс существует и значение не NaN/пустое
             if index < len(row):
                 value = row.iloc[index]
                 if pd.isna(value) or (isinstance(value, str) and value.strip() == ''):
@@ -216,8 +212,7 @@ def convert_dataframes_to_json(results_list):
         except Exception as e:
             print(f"Ошибка при получении значения по индексу {index}: {e}")
             return default
-    
-    # Проверяем и обрабатываем КС (первый элемент списка)
+    # КС
     if len(results_list) > 0:
         ks_data = results_list[0]
         if isinstance(ks_data, pd.DataFrame) and not ks_data.empty:
@@ -244,8 +239,7 @@ def convert_dataframes_to_json(results_list):
                     result.append(item)
                 except Exception as e:
                     print(f"Ошибка при обработке строки КС {idx}: {e}")
-    
-    # Проверяем и обрабатываем контракты (второй элемент списка)
+    # Контракты
     if len(results_list) > 1:
         contract_data = results_list[1]
         if isinstance(contract_data, pd.DataFrame) and not contract_data.empty:
