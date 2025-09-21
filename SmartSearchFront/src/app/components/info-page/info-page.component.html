@@ -32,11 +32,29 @@
         <pre class="json-content">{{ jsonData | json }}</pre>
         
         <div class="json-info">
-          <p>Тип: {{ getDataType() }}</p>
+          <p>Тип: {{ getType() }}</p>
         
         </div>
-
         
+        <div *ngIf = "isKs" >
+
+        </div>
+         <div *ngIf ="isKnowledge">
+
+        </div>
+         <div *ngIf="isAction" >
+          <div>
+
+
+
+            
+          </div>
+        </div>
+         <div *ngIf ="isSupport">
+
+        </div>
+
+
       </div>
       
       <ng-template #noData>

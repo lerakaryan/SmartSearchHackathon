@@ -18,7 +18,7 @@ export class InfoPageComponent {
 @Input() jsonData: any = null;
   receivedTime: Date | null = null;
 isKs: boolean = false;
-ifKnowledge: boolean = false;
+isKnowledge: boolean = false;
 isAction: boolean = false;
 isSupport: boolean = false;
 
@@ -30,9 +30,37 @@ isSupport: boolean = false;
     }
   }
 
-  getDataType(): string {
+  getType(): string {
     if (!this.jsonData) return 'Нет данных';
-    return Array.isArray(this.jsonData) ? 'Массив' : 'Объект';
+
+    this.isKs = false;
+    this.isKnowledge = false;
+    this.isAction = false;
+    this.isSupport = false;
+    if(Array.isArray(this.jsonData))
+      {
+        this.isKnowledge = true;
+      }
+      else 
+      {
+        if (this.jsonData.type !=null)
+          {
+             this.isKs = true;
+          }
+          else
+            {
+              if(this.jsonData.name == "unknown")
+                {
+                  this.isSupport = true;
+                }
+                else{
+              this.isAction = true;
+                }
+            }
+      }
+   
+      console.log(this.isAction, this.isKnowledge, this.isKs, this.isSupport)
+      return "f";
   }
 
  constructor(
