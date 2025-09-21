@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchServiceService } from '../../services/search-service/search-service.service';
 import { RawData } from '../../interfaces/rawData';
 import { debounceTime, distinctUntilChanged, fromEvent, map, filter, switchMap, tap, catchError, of } from 'rxjs';
-import { SearchResponse, RegistryHint, KnowledgeBaseHint, ActionHintIntents } from '../../interfaces/hint';
+import { SearchResponse, RegistryHint, KnowledgeBaseHint, ActionHintIntents, RegistryHintType2, RegistryHintType1 } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-search-line',
@@ -191,16 +191,17 @@ export class SearchLineComponent implements AfterViewInit {
   selectSuggestion(suggestion: any) {
     this.suggestionSelected.emit(suggestion);
     
-    // Заполняем поле ввода в зависимости от типа подсказки
-    if (this.isRegistryHint(suggestion)) {
+    if (suggestion.type === 'registry') {
       if (suggestion.hintType === 1) {
-        this.searchTerm = (suggestion.data as any).contractName;
+        const data = suggestion.data as RegistryHintType1['data'];
+        this.searchTerm = data.contractName;
       } else {
-        this.searchTerm = (suggestion.data as any).ksName;
+        const data = suggestion.data as RegistryHintType2['data'];
+        this.searchTerm = data.ksName;
       }
-    } else if (this.isKnowledgeBaseHint(suggestion)) {
+    } else if (suggestion.type === 'knowledge_base') {
       this.searchTerm = suggestion.text;
-    } else if (this.isIntent(suggestion)) {
+    } else if (suggestion.name) {
       this.searchTerm = suggestion.name;
     }
     
