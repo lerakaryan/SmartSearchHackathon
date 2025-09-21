@@ -14,8 +14,7 @@ import { RegistryHint, SearchResponse } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-home-page',
-  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, RatingButtonComponent,
-    QueryResponseTableComponent],
+  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, RatingButtonComponent, QueryResponseTableComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
   providers: [
@@ -87,7 +86,7 @@ export class HomePageComponent {
     this.showRatingTable = !this.showRatingTable;
   }
 
-  onRatingChange(updatedItem: QueryResponseWithId): void {
+onRatingChange(updatedItem: QueryResponseWithId): void {
     const index = this.queryResponses.findIndex(item => item.id === updatedItem.id);
     if (index !== -1) {
       this.queryResponses[index] = updatedItem;
