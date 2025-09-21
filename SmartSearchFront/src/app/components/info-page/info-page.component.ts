@@ -60,7 +60,7 @@ isSupport: boolean = false;
       }
    
       console.log(this.isAction, this.isKnowledge, this.isKs, this.isSupport)
-      return "f";
+      return "";
   }
 
  constructor(
@@ -70,6 +70,7 @@ isSupport: boolean = false;
 
    ngOnInit(): void {
    console.log(this.jsonData, "ffff");
+  
    }
 
    loadPageData(): void {

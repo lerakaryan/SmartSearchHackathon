@@ -211,6 +211,7 @@ export class SearchLineComponent implements AfterViewInit {
     } else if (suggestion.name) {
       this.searchTerm = suggestion.name;
     }
+  
      this.emitJson(suggestion);
     this.hideSuggestions();
   }
