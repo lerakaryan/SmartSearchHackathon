@@ -23,10 +23,11 @@
     </div>
   </div>
 </div> -->
+<p>ffdouugillllllll</p>
  <div class="displayer">
       <h2>Отображение JSON</h2>
       
-      <div *ngIf="jsonData; else noData" class="json-container">
+      <div *ngIf="jsonData" class="json-container">
         <h3>Полученные данные:</h3>
         <pre class="json-content">{{ jsonData | json }}</pre>
         
@@ -34,6 +35,8 @@
           <p>Тип: {{ getDataType() }}</p>
         
         </div>
+
+        
       </div>
       
       <ng-template #noData>

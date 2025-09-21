@@ -32,10 +32,11 @@ export class HomePageComponent {
 
   
   isSomethingChoosen: boolean = false;
-  somethingToDisplay: any = null;
+  currentJson: any = null;
 
-   onJsonGenerated(data: any) {
-    this.somethingToDisplay = data;
+   onJsonGenerated(jsonData: any) {
+    this.currentJson = jsonData;
+    this.isSomethingChoosen= true;
   }
 
 

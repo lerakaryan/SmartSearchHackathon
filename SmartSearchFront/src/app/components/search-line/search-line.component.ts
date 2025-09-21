@@ -28,6 +28,16 @@ export class SearchLineComponent implements AfterViewInit {
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
   @Output() suggestionSelected = new EventEmitter<any>();
+
+   @Output() jsonGenerated = new EventEmitter<any>();
+  lastGenerated: any = null;
+
+
+  
+  private emitJson(json: any) {
+    this.lastGenerated = json;
+    this.jsonGenerated.emit(json);
+  }
   
   @ViewChild('searchInput') searchInput!: ElementRef;
   
@@ -190,7 +200,8 @@ export class SearchLineComponent implements AfterViewInit {
 
   selectSuggestion(suggestion: any) {
     this.suggestionSelected.emit(suggestion);
-    
+   
+  
     if (suggestion.type === 'registry') {
       if (suggestion.hintType === 1) {
         const data = suggestion.data as RegistryHintType1['data'];
@@ -204,7 +215,7 @@ export class SearchLineComponent implements AfterViewInit {
     } else if (suggestion.name) {
       this.searchTerm = suggestion.name;
     }
-    
+     this.emitJson(suggestion);
     this.hideSuggestions();
   }
 

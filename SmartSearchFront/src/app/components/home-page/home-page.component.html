@@ -7,7 +7,7 @@
 
   <!-- Поисковая строка -->
   <app-search-line 
-    (somethingToDisplay) = "onJsonGenerated($event)"
+    (jsonGenerated) = "onJsonGenerated($event)"
     (searchStarted)="onSearchStarted()"
     (searchError)="onSearchError($event)"
   ></app-search-line>
@@ -22,9 +22,10 @@
     ❌ {{ searchError }}
   </div>
 
-<div calss ="last-page">
-<app-info-page>
-[data]='somethingToDisplay'
+<div *ngIf="isSomethingChoosen" class ="last-page">
+<app-info-page 
+ [jsonData]="currentJson">
+
 </app-info-page>
 </div>
 
