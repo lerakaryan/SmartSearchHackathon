@@ -10,6 +10,7 @@
     (somethingToDisplay) = "onJsonGenerated($event)"
     (searchStarted)="onSearchStarted()"
     (searchError)="onSearchError($event)"
+    (queryChange)="currentQuery = $event"
   ></app-search-line>
 
   <!-- Индикатор загрузки -->
@@ -22,11 +23,11 @@
     ❌ {{ searchError }}
   </div>
 
-<div calss ="last-page">
-<app-info-page>
-[data]='somethingToDisplay'
-</app-info-page>
-</div>
+  <div calss ="last-page">
+    <app-info-page>
+    [data]='somethingToDisplay'
+    </app-info-page>
+  </div>
 
   <!-- Другие компоненты, которые получат результаты -->
   

@@ -28,13 +28,15 @@ export class SearchLineComponent implements AfterViewInit {
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
   @Output() suggestionSelected = new EventEmitter<any>();
-  
+  @Output() queryChange = new EventEmitter<string>();
+
   @ViewChild('searchInput') searchInput!: ElementRef;
   
   searchService = inject(SearchServiceService);
   selectedSuggestionIndex: number = -1;
   private lastQuery: string = '';
 
+        
   ngAfterViewInit() {
     this.setupSearchInputListeners();
   }
@@ -215,6 +217,8 @@ export class SearchLineComponent implements AfterViewInit {
     this.searchStarted.emit();
     this.hideSuggestions();
 
+     this.queryChange.emit(this.searchTerm);
+
     this.rawData.text = this.searchTerm;
     this.searchService.sendData(this.rawData)
       .subscribe({
@@ -254,4 +258,6 @@ export class SearchLineComponent implements AfterViewInit {
       intents: this.suggestions.intents !== null ? 1 : 0
     };
   }
+
+  
 }
