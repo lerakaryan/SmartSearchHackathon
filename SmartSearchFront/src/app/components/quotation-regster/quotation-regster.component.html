@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Информация о закупке</title>
+</head>
+<body>
+
+<div class="container">
+  <h1>Информация о закупке</h1>
+
+    <div class="info-section" *ngIf="registryHintData"> <!-- Используем *ngIf для проверки на undefined -->
+        <label for="nazvanie">Название:</label>
+        <input type="text" id="nazvanie" name="nazvanie" [value]="registryHintData.data.ksName" readonly>
+    </div>
+
+    <div class="info-section" *ngIf="registryHintData">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" [value]="registryHintData.data.ksId" readonly>
+    </div>
+
+    <div class="info-section" *ngIf="registryHintData">
+        <label for="zakon">Закон:</label>
+        <input type="text" id="zakon" name="zakon" [value]="registryHintData.data.lawBasis" readonly>
+    </div>
+
+    <div class="info-section" *ngIf="registryHintData">
+        <label for="daty">Дата завершения:</label>
+        <input type="text" id="daty" name="daty" [value]="registryHintData.data.completionDate" readonly>
+    </div>
+
+</div>
+
+</body>
+</html>
