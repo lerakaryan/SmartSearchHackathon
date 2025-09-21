@@ -10,11 +10,13 @@ import { QueryResponseWithId } from '../../models/query-response';
 import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
 import { RegistryHint, SearchResponse } from '../../interfaces/hint';
+import { InfoPageComponent } from "../info-page/info-page.component";
 
 
 @Component({
   selector: 'app-home-page',
-  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, RatingButtonComponent, QueryResponseTableComponent],
+  imports: [SearchLineComponent, FormsModule, CommonModule, HttpClientModule, RatingButtonComponent,
+    QueryResponseTableComponent, InfoPageComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
   providers: [
@@ -26,6 +28,17 @@ export class HomePageComponent {
   pageIsChosen: boolean = false;
   searchResponse: SearchResponse | null = null;
   isSearching: boolean = false;
+
+
+  
+  isSomethingChoosen: boolean = false;
+  somethingToDisplay: any = null;
+
+   onJsonGenerated(data: any) {
+    this.somethingToDisplay = data;
+  }
+
+
   searchError: string = '';
   router = inject(Router);
 

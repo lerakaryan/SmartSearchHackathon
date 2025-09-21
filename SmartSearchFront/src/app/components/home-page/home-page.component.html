@@ -7,10 +7,9 @@
 
   <!-- Поисковая строка -->
   <app-search-line 
-    (searchResults)="onSearchResults($event)"
+    (somethingToDisplay) = "onJsonGenerated($event)"
     (searchStarted)="onSearchStarted()"
     (searchError)="onSearchError($event)"
-    (suggestionSelected)="onSuggestionSelected($event)"
   ></app-search-line>
 
   <!-- Индикатор загрузки -->
@@ -23,7 +22,37 @@
     ❌ {{ searchError }}
   </div>
 
-  <!-- Модальное окно с таблицей оценок -->
+<div calss ="last-page">
+<app-info-page>
+[data]='somethingToDisplay'
+</app-info-page>
+</div>
+
+  <!-- Другие компоненты, которые получат результаты -->
+  
+<!-- <div *ngIf="searchResponse && searchResults.length > 0 &&!pageIsChosen" class="search-results">
+  <h3 class="results-title">Найдено результатов: {{ searchResults.length }}</h3>
+  
+  <div class="results-grid">
+    <div *ngFor="let result of searchResults" class="result-card">
+      <a 
+        (click)="onArticleClick(result.id)"
+      >
+        <h4 class="result-title">{{ result.largeName }}</h4>
+      </a>
+      
+      <p class="result-preview">{{ result.previewText  }}</p>
+      
+      <div class="result-footer">
+        <span class="result-id">ID: {{ result.id }}</span>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+<!-- Модальное окно с таблицей оценок -->
   <div *ngIf="showRatingTable" class="rating-overlay">
     <div class="rating-modal">
       <div class="modal-header">
@@ -39,5 +68,4 @@
     </div>
   </div>
 
-  <!-- Компонент страницы информации (если нужно) -->
 </div>

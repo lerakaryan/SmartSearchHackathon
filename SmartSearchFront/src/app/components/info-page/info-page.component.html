@@ -23,3 +23,22 @@
     </div>
   </div>
 </div> -->
+ <div class="displayer">
+      <h2>Отображение JSON</h2>
+      
+      <div *ngIf="jsonData; else noData" class="json-container">
+        <h3>Полученные данные:</h3>
+        <pre class="json-content">{{ jsonData | json }}</pre>
+        
+        <div class="json-info">
+          <p>Тип: {{ getDataType() }}</p>
+        
+        </div>
+      </div>
+      
+      <ng-template #noData>
+        <div class="no-data">
+          <p>Ожидание данных... JSON не получен</p>
+        </div>
+      </ng-template>
+    </div>
