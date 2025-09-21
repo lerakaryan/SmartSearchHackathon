@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from catboost_predictor import IntentPredictor
 from entity_extractor import EntityExtractor
-from registry_records import UniversalContractSearcher, convert_dataframe_to_json
+from registry_records import UniversalContractSearcher, convert_dataframes_to_json
 import uvicorn
 import re
 
@@ -93,7 +93,7 @@ def predict_intent(request: TextRequest):
         knowledge_base_articles = knowledge_base_search(text)[:2]
     else:
         if len(text) >= 3:
-            registry_records = convert_dataframe_to_json(registry.search_in_files(files, request.text))
+            registry_records = convert_dataframes_to_json(registry.search_in_files_with_list(files, request.text))
 
         intents = intent_prediction(text)
 
