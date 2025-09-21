@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -13,9 +13,15 @@ import { SearchServiceService } from '../../services/search-service/search-servi
   styleUrl: './info-page.component.css'
 })
 export class InfoPageComponent {
-  loading: boolean = false;
-  error: string | null = null;
-    @Input() pageId: number | null = null;
+  
+  @Input() jsonData: any = null;
+
+
+  getDataType(): string {
+    if (!this.jsonData) return 'Нет данных';
+    return Array.isArray(this.jsonData) ? 'Массив' : 'Объект';
+  }
+
  constructor(
     private route: ActivatedRoute,
     private searchService: SearchServiceService
@@ -26,9 +32,7 @@ export class InfoPageComponent {
    }
 
    loadPageData(): void {
-    this.loading = true;
-    this.error = null;
-console.log("всё норм");
+  
     // this.route.params.subscribe(params => {
     //   const pageId = params['id'];
       

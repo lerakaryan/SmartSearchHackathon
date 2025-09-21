@@ -10,7 +10,6 @@ from entity_extractor import EntityExtractor
 from registry_records import UniversalContractSearcher, convert_dataframe_to_json
 import uvicorn
 import re
-
 predictor = IntentPredictor()
 extractor = EntityExtractor()
 registry = UniversalContractSearcher()
