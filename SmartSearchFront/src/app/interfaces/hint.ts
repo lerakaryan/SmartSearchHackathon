@@ -3,15 +3,12 @@
 export interface SearchResponse {
   registry_records: RegistryHint[];
   knowledge_base_articles: KnowledgeBaseHint[];
-  intents: ActionHintIntents;
+  intents: ActionHintIntents | null;
 }
 
 export interface ActionHintIntents {
   name: string;
-  entities: {
-    names: string;
-    // добавьте другие поля если необходимо
-  };
+  entities: Record<string, any>;
 }
 
 export interface RegistryHint {

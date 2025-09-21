@@ -10,6 +10,7 @@ import { InfoPageComponent } from "../info-page/info-page.component";
 import { QueryResponseWithId } from '../../models/query-response';
 import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
+import { RegistryHint, SearchResponse } from '../../interfaces/hint';
 
 
 @Component({
@@ -23,28 +24,12 @@ import { QueryResponseTableComponent } from '../query-response-table';
   ]
 })
 export class HomePageComponent {
-
-
- 
-
-  onSuggestionSelected(suggestion: any) {
-    this.pageIsChosen = true;
-    this.selectedPageId = suggestion.id;
-    console.log('Выбрана статья:', suggestion);
-  }
-onArticleClick(pageId: number) {
-this.pageIsChosen = true;
-    this.selectedPageId = pageId;
-    console.log('Выбрана статья с ID:', pageId);
-}
-
  selectedPageId: number | null = null; 
-
-pageIsChosen: boolean = false;
-searchResults: any ;
+  pageIsChosen: boolean = false;
+  searchResponse: SearchResponse | null = null; // Изменил на searchResponse для нового формата
   isSearching: boolean = false;
   searchError: string = '';
- router = inject(Router);
+  router = inject(Router);
 
   showRatingTable = false;
   queryResponses: QueryResponseWithId[] = [
@@ -54,38 +39,55 @@ searchResults: any ;
     { id: 4, query: 'где находится', response: 'в офисе', rating: 2 }
   ];
 
+  // Обработчик результатов поиска (новый формат)
+  onSearchResults(response: SearchResponse): void {
+    this.searchResponse = response;
+    this.pageIsChosen = false; 
+    this.isSearching = false;
+    this.searchError = '';
+    console.log('Результаты поиска:', this.searchResponse);
+  }
 
-//  onSearchResults(results: Hint): void {
-//     this.searchResults = results;
-//      this.searchResults = [{
-//     id:1,
-//     largeName: "1211",
-//     previewText: "fff"
+  // Обработчик выбора подсказки
+  onSuggestionSelected(suggestion: any): void {
+    this.pageIsChosen = true;
+    // Для подсказок из реестра используем contractId или ksId
+    if (suggestion.type === 'registry') {
+      this.selectedPageId = suggestion.hintType === 1 
+        ? parseInt((suggestion.data as any).contractId) 
+        : parseInt((suggestion.data as any).ksId);
+    } else if (suggestion.type === 'knowledge_base') {
+      // Для базы знаний можно использовать хэш или другой идентификатор
+      this.selectedPageId = this.generateIdFromText(suggestion.text);
+    } else if (suggestion.name) {
+      // Для действий
+      this.selectedPageId = this.generateIdFromText(suggestion.name);
+    }
+    console.log('Выбрана подсказка:', suggestion);
+  }
 
-//   }]
-//    this.pageIsChosen = false; 
-//   console.log(this.searchResults)
-//     this.isSearching = false;
-//     this.searchError = '';
-//     console.log('Результаты поиска:',  this.searchResults);
+  // Обработчик клика по статье (оставляем для обратной совместимости)
+  onArticleClick(pageId: number): void {
+    this.pageIsChosen = true;
+    this.selectedPageId = pageId;
+    console.log('Выбрана статья с ID:', pageId);
+  }
 
-//   }
-
-    // Обработчик начала поиска
+  // Обработчик начала поиска
   onSearchStarted(): void {
     this.isSearching = true;
     this.searchError = '';
-  this.pageIsChosen = false; 
+    this.pageIsChosen = false; 
   }
 
   // Обработчик ошибок поиска
   onSearchError(error: string): void {
-     this.pageIsChosen = false; 
+    this.pageIsChosen = false; 
     this.searchError = error;
     this.isSearching = false;
   }
 
-   onRatingButtonClick(): void {
+  onRatingButtonClick(): void {
     this.showRatingTable = !this.showRatingTable;
   }
 
@@ -94,9 +96,53 @@ searchResults: any ;
     if (index !== -1) {
       this.queryResponses[index] = updatedItem;
       console.log('Оценка обновлена:', updatedItem);
-      
-      // Здесь можно отправить данные на сервер
-      // this.yourService.updateRating(updatedItem).subscribe();
     }
+  }
+  getRecordType(record: RegistryHint): string {
+    return record.hintType === 1 ? 'Контракт' : 'КС';
+  }
+
+  getRecordId(record: RegistryHint): string {
+    return record.hintType === 1 
+      ? (record.data as any).contractId 
+      : (record.data as any).ksId;
+  }
+
+  getContractId(record: any): string {
+    return (record.data as any).contractId;
+  }
+
+  getKsId(record: any): string {
+    return (record.data as any).ksId;
+  }
+
+  // Вспомогательный метод для генерации ID из текста
+  private generateIdFromText(text: string): number {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = ((hash << 5) - hash) + text.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  // Вспомогательный метод для отображения реестровых записей
+  getRegistryPreview(record: RegistryHint): string {
+    if (record.hintType === 1) {
+      const data = record.data as any;
+      return `Контракт: ${data.contractName} (${data.contractId})`;
+    } else {
+      const data = record.data as any;
+      return `КС: ${data.ksName} (${data.ksId})`;
+    }
+  }
+
+  // Метод для получения общего количества результатов
+  getTotalResultsCount(): number {
+    if (!this.searchResponse) return 0;
+    
+    return this.searchResponse.registry_records.length +
+           this.searchResponse.knowledge_base_articles.length +
+           (this.searchResponse.intents ? 1 : 0);
   }
 }

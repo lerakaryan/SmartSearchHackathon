@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, inject, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SearchServiceService } from '../../services/search-service/search-service.service';
 import { RawData } from '../../interfaces/rawData';
-import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
-import { BaseHint, SearchResponse } from '../../interfaces/hint';
+import { debounceTime, distinctUntilChanged, fromEvent, map, filter, switchMap, tap, catchError, of } from 'rxjs';
+import { SearchResponse, RegistryHint, KnowledgeBaseHint, ActionHintIntents } from '../../interfaces/hint';
 
 @Component({
   selector: 'app-search-line',
@@ -12,127 +12,214 @@ import { BaseHint, SearchResponse } from '../../interfaces/hint';
   templateUrl: './search-line.component.html',
   styleUrl: './search-line.component.css'
 })
-export class SearchLineComponent {
+export class SearchLineComponent implements AfterViewInit {
   searchTerm: string = '';
   isLoading: boolean = false;
-rawData: RawData = { text: '' };
- showSuggestions: boolean = false;
-  suggestions!: SearchResponse; 
-  @Output() searchResults = new EventEmitter<any>();
+  rawData: RawData = { text: '' };
+  showSuggestions: boolean = false;
+  
+  suggestions: SearchResponse = {
+    registry_records: [],
+    knowledge_base_articles: [],
+    intents: null
+  };
+  
+  @Output() searchResults = new EventEmitter<SearchResponse>();
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
-@ViewChild('searchInput') searchInput!: ElementRef;
+  @Output() suggestionSelected = new EventEmitter<any>();
+  
+  @ViewChild('searchInput') searchInput!: ElementRef;
+  
   searchService = inject(SearchServiceService);
- @Output() suggestionSelected = new EventEmitter<any>(); // Событие выбора подсказки
   selectedSuggestionIndex: number = -1;
+  private lastQuery: string = '';
 
   ngAfterViewInit() {
-    // Автопоиск при вводе
+    this.setupSearchInputListeners();
+  }
+
+  private setupSearchInputListeners() {
+    // Проверяем, что searchInput инициализирован
+    if (!this.searchInput?.nativeElement) {
+      console.error('Search input element not found');
+      return;
+    }
+
+    // Автопоиск при вводе с debounce
     fromEvent(this.searchInput.nativeElement, 'input')
       .pipe(
-        map((event: any) => event.target.value),
-        debounceTime(200), // Уменьшил задержку для более быстрого отклика
-        distinctUntilChanged()
+        map((event: any) => event.target.value.trim()),
+        filter(query => query.length > 2),
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(query => {
+          this.lastQuery = query;
+          this.isLoading = true;
+          this.showSuggestions = true;
+        }),
+        switchMap(query => 
+          this.searchService.sendData({ text: query }).pipe(
+            catchError(error => {
+              this.isLoading = false;
+              this.searchError.emit('Ошибка загрузки подсказок');
+              console.error('Suggestions error:', error);
+              return of({
+                registry_records: [],
+                knowledge_base_articles: [],
+                intents: null
+              } as SearchResponse);
+            })
+          )
+        )
       )
-      .subscribe((value: string) => {
-        if (value.trim().length > 0) {
-          this.showSuggestionsForQuery(value);
-        } else {
-          this.hideSuggestions();
+      .subscribe((response: SearchResponse) => {
+        this.isLoading = false;
+        this.suggestions = response;
+        this.showSuggestions = this.hasSuggestions();
+      });
+
+    // Навигация по подсказкам клавишами
+    fromEvent(this.searchInput.nativeElement, 'keydown')
+      .subscribe((event: any) => {
+        if (!this.showSuggestions) return;
+
+        const totalSuggestions = this.getTotalSuggestionsCount();
+
+        switch (event.key) {
+          case 'ArrowDown':
+            event.preventDefault();
+            this.selectedSuggestionIndex = 
+              this.selectedSuggestionIndex < totalSuggestions - 1 
+                ? this.selectedSuggestionIndex + 1 
+                : 0;
+            break;
+          case 'ArrowUp':
+            event.preventDefault();
+            this.selectedSuggestionIndex = 
+              this.selectedSuggestionIndex > 0 
+                ? this.selectedSuggestionIndex - 1 
+                : totalSuggestions - 1;
+            break;
+          case 'Enter':
+            if (this.selectedSuggestionIndex >= 0) {
+              event.preventDefault();
+              this.selectSuggestionByIndex(this.selectedSuggestionIndex);
+            }
+            break;
+          case 'Escape':
+            this.hideSuggestions();
+            break;
         }
       });
 
-    // Навигация по подсказкам
-    // fromEvent(this.searchInput.nativeElement, 'keydown')
-    //   .subscribe((event: any) => {
-    // //    if (this.showSuggestions && this.suggestions.length > 0) {
-    //       switch (event.key) {
-    //         case 'ArrowDown':
-    //           event.preventDefault();
-    //           this.selectNextSuggestion();
-    //           break;
-    //         case 'ArrowUp':
-    //           event.preventDefault();
-    //           this.selectPreviousSuggestion();
-    //           break;
-    //         case 'Enter':
-    //           event.preventDefault();
-    //           if (this.selectedSuggestionIndex >= 0) {
-    //            // this.selectSuggestion(this.suggestions[this.selectedSuggestionIndex]);
-    //           }
-    //           break;
-    //         case 'Escape':
-    //           this.hideSuggestions();
-    //           break;
-    //       }
-    //     }
-    //  // }
-    // );
+    // Скрываем подсказки при клике вне области
+    fromEvent(document, 'click')
+      .subscribe((event: any) => {
+        if (this.searchInput.nativeElement && !this.searchInput.nativeElement.contains(event.target)) {
+          this.hideSuggestions();
+        }
+      });
   }
 
+  // Сделал публичным для использования в шаблоне
+  hasSuggestions(): boolean {
+    return this.suggestions.registry_records.length > 0 ||
+           this.suggestions.knowledge_base_articles.length > 0 ||
+           (this.suggestions.intents !== null && this.suggestions.intents.name !== '');
+  }
 
-  
-showSuggestionsForQuery(query: string) {
-  this.onSearch();
-  console.log(this.suggestions + "faadfaf");
- 
+  // Сделал публичным для использования в шаблоне
+  getTotalSuggestionsCount(): number {
+    return this.suggestions.registry_records.length +
+           this.suggestions.knowledge_base_articles.length +
+           (this.suggestions.intents !== null ? 1 : 0);
+  }
 
-  console.log('Найдены подсказки:', this.suggestions);
- // this.showSuggestions = this.suggestions.length > 0;
-  this.selectedSuggestionIndex = -1;
-}
-  
- selectSuggestion(suggestion: any) {
-    this.suggestionSelected.emit(suggestion); // Отправляем выбранную подсказку
-    this.searchTerm= suggestion.largeName; // Заполняем поле выбранной подсказкой
+  // Получение подсказки по индексу с учетом всех типов
+  private getSuggestionByIndex(index: number): any {
+    const registryCount = this.suggestions.registry_records.length;
+    const knowledgeCount = this.suggestions.knowledge_base_articles.length;
+
+    if (index < registryCount) {
+      return this.suggestions.registry_records[index];
+    } else if (index < registryCount + knowledgeCount) {
+      return this.suggestions.knowledge_base_articles[index - registryCount];
+    } else if (this.suggestions.intents !== null) {
+      return this.suggestions.intents;
+    }
+    return null;
+  }
+
+  // Генерация текста для отображения подсказки
+  getSuggestionText(suggestion: any): string {
+    if (this.isRegistryHint(suggestion)) {
+      const data = suggestion.data;
+      if (suggestion.hintType === 1) {
+        return `Контракт: ${(data as any).contractName} (${(data as any).contractId})`;
+      } else {
+        return `КС: ${(data as any).ksName} (${(data as any).ksId})`;
+      }
+    } else if (this.isKnowledgeBaseHint(suggestion)) {
+      return `База знаний: ${suggestion.text}`;
+    } else if (this.isIntent(suggestion)) {
+      return `Действие: ${suggestion.name}`;
+    }
+    return '';
+  }
+
+  // Вспомогательные методы проверки типов
+  private isRegistryHint(item: any): item is RegistryHint {
+    return item && item.type === 'registry';
+  }
+
+  private isKnowledgeBaseHint(item: any): item is KnowledgeBaseHint {
+    return item && item.type === 'knowledge_base';
+  }
+
+  private isIntent(item: any): item is ActionHintIntents {
+    return item && item.name !== undefined;
+  }
+
+  selectSuggestionByIndex(index: number) {
+    const suggestion = this.getSuggestionByIndex(index);
+    if (suggestion) {
+      this.selectSuggestion(suggestion);
+    }
+  }
+
+  selectSuggestion(suggestion: any) {
+    this.suggestionSelected.emit(suggestion);
+    
+    // Заполняем поле ввода в зависимости от типа подсказки
+    if (this.isRegistryHint(suggestion)) {
+      if (suggestion.hintType === 1) {
+        this.searchTerm = (suggestion.data as any).contractName;
+      } else {
+        this.searchTerm = (suggestion.data as any).ksName;
+      }
+    } else if (this.isKnowledgeBaseHint(suggestion)) {
+      this.searchTerm = suggestion.text;
+    } else if (this.isIntent(suggestion)) {
+      this.searchTerm = suggestion.name;
+    }
+    
     this.hideSuggestions();
   }
 
-  // selectNextSuggestion() {
-  //   if (this.selectedSuggestionIndex < this.suggestions.length - 1) {
-  //     this.selectedSuggestionIndex++;
-  //   } else {
-  //     this.selectedSuggestionIndex = 0;
-  //   }
-  // }
-
-  // selectPreviousSuggestion() {
-  //   if (this.selectedSuggestionIndex > 0) {
-  //     this.selectedSuggestionIndex--;
-  //   } else {
-  //     this.selectedSuggestionIndex = this.suggestions.length - 1;
-  //   }
-  // }
-
-  hideSuggestions() {
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
-  }
-
-   onSearch(): void {
+  onSearch(): void {
     if (!this.searchTerm.trim()) return;
 
     this.isLoading = true;
     this.searchStarted.emit();
+    this.hideSuggestions();
 
     this.rawData.text = this.searchTerm;
-    this.searchService.sendData(this.rawData) 
+    this.searchService.sendData(this.rawData)
       .subscribe({
         next: (response: SearchResponse) => {
-          console.log(response + " response");
           this.isLoading = false;
           this.searchResults.emit(response);
-          this.suggestions = response;
-          
-          // Теперь это будет работать
-          console.log(this.suggestions.registry_records, "registry records");
-          
-          if (this.suggestions.registry_records.length > 0) {
-            console.log(this.suggestions.registry_records[0], "first registry record");
-          }
-          
-          console.log(this.suggestions.knowledge_base_articles, "knowledge base articles");
-          console.log(this.suggestions.intents, "intents");
         },
         error: (error) => {
           this.isLoading = false;
@@ -142,40 +229,28 @@ showSuggestionsForQuery(query: string) {
       });
   }
 
-  searchOne(){
-    
-  }
-
-  onKeyPress(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.searchOne();
-    }
-    else
-      {
-           this.onSearch();
-      }
-  }
-
-   clearSearch(): void {
+  clearSearch(): void {
     this.searchTerm = '';
-    this.rawData.text = ''; // очищаем и rawData
-    this.searchResults.emit(null);
+    this.rawData.text = '';
+    this.searchResults.emit({
+      registry_records: [],
+      knowledge_base_articles: [],
+      intents: null
+    });
+    this.hideSuggestions();
   }
 
-    // private getSearchResults(query: string): any[] {
-    // // Замените на реальный API вызов
-    // const mockData = [
-    //   { id: 1, largeName: "Angular разработка", previewText: "Руководство по Angular разработке" },
-    //   { id: 2, largeName: "React vs Angular", previewText: "Сравнение фреймворков 2024" },
-    //   { id: 3, largeName: "JavaScript основы", previewText: "Основы JavaScript для начинающих" },
-    //   { id: 4, largeName: "TypeScript преимущества", previewText: "Почему выбирают TypeScript" },
-    //   { id: 5, largeName: "Веб разработка 2024", previewText: "Новые тренды веб разработки" }
-    // ];
+  hideSuggestions() {
+    this.showSuggestions = false;
+    this.selectedSuggestionIndex = -1;
+  }
 
-  //  return mockData.filter(item => 
-  //     item.largeName.toLowerCase().includes(query.toLowerCase()) ||
-  //     item.previewText.toLowerCase().includes(query.toLowerCase())
-  //   );
-  // }
-
+  // Для отладки
+  get debugInfo() {
+    return {
+      registry: this.suggestions.registry_records.length,
+      knowledge: this.suggestions.knowledge_base_articles.length,
+      intents: this.suggestions.intents !== null ? 1 : 0
+    };
+  }
 }

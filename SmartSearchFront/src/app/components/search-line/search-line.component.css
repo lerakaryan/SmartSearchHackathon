@@ -126,3 +126,122 @@
     padding: 10px 12px;
   }
 }
+
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 2px solid #dfe1e5;
+  border-radius: 24px;
+  padding: 8px 16px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+  border-color: #4285f4;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 8px 0;
+  background: transparent;
+}
+
+.search-btn, .clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #70757a;
+  transition: color 0.2s ease;
+}
+
+.search-btn:hover, .clear-btn:hover {
+  color: #4285f4;
+}
+
+.search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dfe1e5;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(32, 33, 36, 0.28);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+  background-color: #f8f9fa;
+}
+
+.suggestion-icon {
+  margin-right: 12px;
+  font-size: 18px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.suggestion-content {
+  flex: 1;
+}
+
+.suggestion-title {
+  font-weight: 500;
+  color: #1a73e8;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.suggestion-preview {
+  color: #5f6368;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestions-loading {
+  padding: 16px;
+  text-align: center;
+  color: #70757a;
+  font-style: italic;
+}
+
+.debug-info {
+  font-size: 12px;
+  color: #70757a;
+  margin-top: 8px;
+  text-align: center;
+}
