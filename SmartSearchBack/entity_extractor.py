@@ -44,28 +44,26 @@ class EntityExtractor:
 
         for match in self.dates_extractor(text):
             d = match.fact
-            results['dates'] = results.get('dates', []) + [f"Date(year={d.year}, month={d.month}, day={d.day})"]
+            date_str = f"{d.year}.{d.month:02}.{d.day:02}"
+            results['dates'] = results.get('dates', []) + [date_str]
 
         for match in self.money_extractor(text):
             m = match.fact
-            results['money'] = results.get('money', []) + [
-                f"Money(amount={m.amount}, currency='{m.currency}')"
-            ]
+            money_str = f"{m.amount} {m.currency}"
+            results['money'] = results.get('money', []) + [money_str]
 
             # --- Addresses ---
         match = self.addr_extractor.find(text)
         if match:
-            parts = ", ".join([f"AddrPart(value='{p.value}', type='{p.type}')" for p in match.fact.parts])
-            results['addr'] = f"Addr(parts=[{parts}])"
+            parts = ", ".join([f"{p.type}: {p.value}" for p in match.fact.parts])
+            results['addr'] = parts
 
         match = self.names_extractor.find(text)
         if match:
-            first = match.fact.first
-            last = match.fact.last
-            middle = getattr(match.fact, "middle", None)
-            results['names'] = (
-                f"Name(first='{first}', last='{last}', middle={middle})"
-            )
+            first = match.fact.first or ""
+            last = match.fact.last or ""
+            middle = getattr(match.fact, "middle", "") or ""
+            results['names'] = " ".join(part for part in [first, last, middle] if part)
 
         return results
 
