@@ -7,9 +7,10 @@
 
   <!-- Поисковая строка -->
   <app-search-line 
-   
+    (searchResults)="onSearchResults($event)"
     (searchStarted)="onSearchStarted()"
     (searchError)="onSearchError($event)"
+    (suggestionSelected)="onSuggestionSelected($event)"
   ></app-search-line>
 
   <!-- Индикатор загрузки -->
@@ -22,32 +23,62 @@
     ❌ {{ searchError }}
   </div>
 
-  <!-- Другие компоненты, которые получат результаты -->
-  
-<div *ngIf="searchResults && searchResults.length > 0 &&!pageIsChosen" class="search-results">
-  <h3 class="results-title">Найдено результатов: {{ searchResults.length }}</h3>
-  
-  <div class="results-grid">
-    <div *ngFor="let result of searchResults" class="result-card">
-      <a 
-        (click)="onArticleClick(result.id)"
-      >
-        <h4 class="result-title">{{ result.largeName }}</h4>
-      </a>
-      
-      <p class="result-preview">{{ result.previewText  }}</p>
-      
-      <div class="result-footer">
-        <span class="result-id">ID: {{ result.id }}</span>
+  <!-- Результаты поиска в новом формате -->
+  <div *ngIf="searchResponse && getTotalResultsCount() > 0 && !pageIsChosen" class="search-results">
+    <!-- <h3 class="results-title">Найдено результатов: {{ getTotalResultsCount() }}</h3> -->
+    
+    <!-- Реестровые записи -->
+    <!-- <div *ngIf="searchResponse.registry_records.length > 0" class="result-section">
+      <h4>Реестровые записи ({{ searchResponse.registry_records.length }})</h4>
+      <div class="results-grid">
+        <div *ngFor="let record of searchResponse.registry_records" class="result-card">
+          <a (click)="onSuggestionSelected(record)">
+            <h4 class="result-title">
+              {{ getRecordType(record) }}
+            </h4>
+          </a>
+          <p class="result-preview">{{ getRegistryPreview(record) }}</p>
+          <div class="result-footer">
+            <span class="result-id">
+              ID: {{ getRecordId(record) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- База знаний -->
+    <!-- <div *ngIf="searchResponse.knowledge_base_articles.length > 0" class="result-section">
+      <h4>База знаний ({{ searchResponse.knowledge_base_articles.length }})</h4>
+      <div class="results-grid">
+        <div *ngFor="let article of searchResponse.knowledge_base_articles" class="result-card">
+          <a (click)="onSuggestionSelected(article)">
+            <h4 class="result-title">Статья базы знаний</h4>
+          </a>
+          <p class="result-preview">{{ article.text }}</p>
+          <div class="result-footer">
+            <a [href]="article.link" target="_blank" class="result-link">Открыть ссылку</a>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Действия -->
+    <!-- <div *ngIf="searchResponse.intents" class="result-section">
+      <h4>Действие</h4>
+      <div class="results-grid">
+        <div class="result-card">
+          <a (click)="onSuggestionSelected(searchResponse.intents)">
+            <h4 class="result-title">{{ searchResponse.intents.name }}</h4>
+          </a>
+          <p class="result-preview">Системное действие</p>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </div> -->
 
-
-
-<!-- Модальное окно с таблицей оценок -->
-  <div *ngIf="showRatingTable" class="rating-overlay">
+  <!-- Модальное окно с таблицей оценок -->
+  <!-- <div *ngIf="showRatingTable" class="rating-overlay">
     <div class="rating-modal">
       <div class="modal-header">
         <h2>Оценка ответов</h2>
@@ -60,6 +91,7 @@
         ></app-query-response-table>
       </div>
     </div>
-  </div>
+  </div> -->
 
+  <!-- Компонент страницы информации (если нужно) -->
 </div>

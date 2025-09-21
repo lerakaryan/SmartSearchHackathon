@@ -6,7 +6,6 @@ import { HttpClientModule } from '@angular/common/http'; // ← Добавьте
 import { SearchServiceService } from '../../services/search-service/search-service.service';
 
 import { Router } from '@angular/router';
-import { InfoPageComponent } from "../info-page/info-page.component";
 import { QueryResponseWithId } from '../../models/query-response';
 import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
@@ -24,9 +23,9 @@ import { RegistryHint, SearchResponse } from '../../interfaces/hint';
   ]
 })
 export class HomePageComponent {
- selectedPageId: number | null = null; 
+  selectedPageId: number | null = null; 
   pageIsChosen: boolean = false;
-  searchResponse: SearchResponse | null = null; // Изменил на searchResponse для нового формата
+  searchResponse: SearchResponse | null = null;
   isSearching: boolean = false;
   searchError: string = '';
   router = inject(Router);
@@ -39,7 +38,7 @@ export class HomePageComponent {
     { id: 4, query: 'где находится', response: 'в офисе', rating: 2 }
   ];
 
-  // Обработчик результатов поиска (новый формат)
+  // Обработчик результатов поиска
   onSearchResults(response: SearchResponse): void {
     this.searchResponse = response;
     this.pageIsChosen = false; 
@@ -51,22 +50,19 @@ export class HomePageComponent {
   // Обработчик выбора подсказки
   onSuggestionSelected(suggestion: any): void {
     this.pageIsChosen = true;
-    // Для подсказок из реестра используем contractId или ksId
     if (suggestion.type === 'registry') {
       this.selectedPageId = suggestion.hintType === 1 
-        ? parseInt((suggestion.data as any).contractId) 
-        : parseInt((suggestion.data as any).ksId);
+        ? parseInt(this.getContractId(suggestion)) 
+        : parseInt(this.getKsId(suggestion));
     } else if (suggestion.type === 'knowledge_base') {
-      // Для базы знаний можно использовать хэш или другой идентификатор
       this.selectedPageId = this.generateIdFromText(suggestion.text);
     } else if (suggestion.name) {
-      // Для действий
       this.selectedPageId = this.generateIdFromText(suggestion.name);
     }
     console.log('Выбрана подсказка:', suggestion);
   }
 
-  // Обработчик клика по статье (оставляем для обратной совместимости)
+  // Обработчик клика по статье
   onArticleClick(pageId: number): void {
     this.pageIsChosen = true;
     this.selectedPageId = pageId;
@@ -98,6 +94,8 @@ export class HomePageComponent {
       console.log('Оценка обновлена:', updatedItem);
     }
   }
+
+  // Новые методы для шаблона
   getRecordType(record: RegistryHint): string {
     return record.hintType === 1 ? 'Контракт' : 'КС';
   }
@@ -121,7 +119,7 @@ export class HomePageComponent {
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       hash = ((hash << 5) - hash) + text.charCodeAt(i);
-      hash = hash & hash; // Convert to 32bit integer
+      hash = hash & hash;
     }
     return Math.abs(hash);
   }
