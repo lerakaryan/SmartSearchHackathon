@@ -28,16 +28,6 @@ export class SearchLineComponent implements AfterViewInit {
   @Output() searchStarted = new EventEmitter<void>();
   @Output() searchError = new EventEmitter<string>();
   @Output() suggestionSelected = new EventEmitter<any>();
-
-   @Output() jsonGenerated = new EventEmitter<any>();
-  lastGenerated: any = null;
-
-
-  
-  private emitJson(json: any) {
-    this.lastGenerated = json;
-    this.jsonGenerated.emit(json);
-  }
   
   @ViewChild('searchInput') searchInput!: ElementRef;
   
@@ -45,6 +35,12 @@ export class SearchLineComponent implements AfterViewInit {
   selectedSuggestionIndex: number = -1;
   private lastQuery: string = '';
 
+       @Output() jsonGenerated = new EventEmitter<any>();
+  lastGenerated: any = null;
+  private emitJson(json: any) {
+    this.lastGenerated = json;
+    this.jsonGenerated.emit(json);
+  }  
   ngAfterViewInit() {
     this.setupSearchInputListeners();
   }
@@ -226,6 +222,8 @@ export class SearchLineComponent implements AfterViewInit {
     this.searchStarted.emit();
     this.hideSuggestions();
 
+  
+
     this.rawData.text = this.searchTerm;
     this.searchService.sendData(this.rawData)
       .subscribe({
@@ -265,4 +263,6 @@ export class SearchLineComponent implements AfterViewInit {
       intents: this.suggestions.intents !== null ? 1 : 0
     };
   }
+
+  
 }

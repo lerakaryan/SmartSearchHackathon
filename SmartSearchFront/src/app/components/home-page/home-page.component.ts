@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SearchLineComponent } from "../search-line/search-line.component";
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,7 @@ import { RatingButtonComponent } from '../rating-button.component';
 import { QueryResponseTableComponent } from '../query-response-table';
 import { RegistryHint, SearchResponse } from '../../interfaces/hint';
 import { InfoPageComponent } from "../info-page/info-page.component";
+import { HistoryService } from '../../services/search-service/history.service';
 
 
 @Component({
@@ -23,14 +24,12 @@ import { InfoPageComponent } from "../info-page/info-page.component";
     SearchServiceService // ← Добавьте сервис в providers
   ]
 })
-export class HomePageComponent {
+export class HomePageComponent implements OnInit {
   selectedPageId: number | null = null; 
   pageIsChosen: boolean = false;
   searchResponse: SearchResponse | null = null;
   isSearching: boolean = false;
-
-
-  
+  currentQuery: string = '';
   isSomethingChoosen: boolean = false;
   currentJson: any = null;
 
@@ -44,12 +43,20 @@ export class HomePageComponent {
   router = inject(Router);
 
   showRatingTable = false;
-  queryResponses: QueryResponseWithId[] = [
-    { id: 1, query: 'как дела', response: 'нормально', rating: 0 },
-    { id: 2, query: 'сколько времени', response: '15:30', rating: 4 },
-    { id: 3, query: 'какая погода', response: 'солнечно', rating: 0 },
-    { id: 4, query: 'где находится', response: 'в офисе', rating: 2 }
-  ];
+
+  private historyService = inject(HistoryService); // Добавьте сервис
+  queryResponses: QueryResponseWithId[] = []; // Теперь будем использовать историю
+  
+  
+  ngOnInit() {
+    // Загружаем историю при инициализации
+    this.loadHistory();
+  }
+
+  // Загрузить историю из localStorage
+  loadHistory(): void {
+    this.queryResponses = this.historyService.getHistory();
+  }
 
   // Обработчик результатов поиска
   onSearchResults(response: SearchResponse): void {
@@ -57,12 +64,22 @@ export class HomePageComponent {
     this.pageIsChosen = false; 
     this.isSearching = false;
     this.searchError = '';
+
+        // Сохраняем в историю
+    this.historyService.saveSearchHistory(this.currentQuery, response);
+    this.loadHistory(); // Обновляем список
+
     console.log('Результаты поиска:', this.searchResponse);
   }
 
   // Обработчик выбора подсказки
   onSuggestionSelected(suggestion: any): void {
     this.pageIsChosen = true;
+
+        // Сохраняем выбранный элемент в историю
+    this.historyService.saveSearchHistory(this.currentQuery, this.searchResponse, suggestion);
+    this.loadHistory(); // Обновляем список
+
     if (suggestion.type === 'registry') {
       this.selectedPageId = suggestion.hintType === 1 
         ? parseInt(this.getContractId(suggestion)) 
@@ -75,6 +92,20 @@ export class HomePageComponent {
     console.log('Выбрана подсказка:', suggestion);
   }
 
+ // Добавьте свойство для хранения текущего запроса
+
+
+  // Обновите обработчик поиска
+  onSearchStarted(): void {
+    this.isSearching = true;
+    this.searchError = '';
+    this.pageIsChosen = false;
+    // Сохраняем текущий запрос
+  }
+
+
+
+
   // Обработчик клика по статье
   onArticleClick(pageId: number): void {
     this.pageIsChosen = true;
@@ -82,12 +113,6 @@ export class HomePageComponent {
     console.log('Выбрана статья с ID:', pageId);
   }
 
-  // Обработчик начала поиска
-  onSearchStarted(): void {
-    this.isSearching = true;
-    this.searchError = '';
-    this.pageIsChosen = false; 
-  }
 
   // Обработчик ошибок поиска
   onSearchError(error: string): void {
@@ -100,12 +125,12 @@ export class HomePageComponent {
     this.showRatingTable = !this.showRatingTable;
   }
 
-onRatingChange(updatedItem: QueryResponseWithId): void {
-    const index = this.queryResponses.findIndex(item => item.id === updatedItem.id);
-    if (index !== -1) {
-      this.queryResponses[index] = updatedItem;
-      console.log('Оценка обновлена:', updatedItem);
-    }
+  // Обработчик обновления оценки
+  onRatingChange(updatedItem: QueryResponseWithId): void {
+    // Обновляем оценку в истории
+    this.historyService.updateRating(updatedItem.id, updatedItem.rating);
+    this.loadHistory(); // Обновляем список
+    console.log('Оценка обновлена:', updatedItem);
   }
 
   // Новые методы для шаблона

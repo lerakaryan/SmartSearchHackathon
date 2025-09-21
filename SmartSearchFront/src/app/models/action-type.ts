@@ -12,7 +12,7 @@ export interface FieldConfig {
   label: string;
   type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'file';
   required: boolean;
-  options?: string[]; // для select
+  options?: string[];
 }
 
 export interface ActionConfig {
